@@ -49,3 +49,7 @@ test {
 bootRun {
   jvmArgs=["-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=18080"]
 }
+
+bootJar {
+	layered()
+}

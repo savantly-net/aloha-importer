@@ -23,7 +23,7 @@ import net.savantly.aloha.importer.domain.importedFiles.ImportState;
 import net.savantly.aloha.importer.domain.importedFiles.ImportedFile;
 import net.savantly.aloha.importer.domain.importedFiles.ImportedFileRepository;
 
-public abstract class AbstractDbfImporter<T extends ImportIdentifiable, ID extends Serializable> {
+public abstract class AbstractDbfImporter<T extends ImportIdentifiable, ID extends Serializable> implements DbfImporter<T, ID> {
 	
 	private final Logger log = LoggerFactory.getLogger(this.getClass());
 	private final ObjectMapper mapper = new ObjectMapper();
@@ -37,6 +37,7 @@ public abstract class AbstractDbfImporter<T extends ImportIdentifiable, ID exten
 		this.clazz = clazz;
 	}
 	
+	@Override
 	public ImportedFile process(ImportProcessingRequest request) {
 		
 		// make sure this file hasn't been processed yet
