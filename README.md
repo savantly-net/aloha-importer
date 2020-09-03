@@ -1,5 +1,13 @@
-# Aloha DBF Importer
+# Aloha DBF Importer  
 
+
+### Docker Compose
+The easiest way to get started, is to use the docker image, or docker compose file included.  
+
+`docker-compose up`  
+
+### Usage  
+To import a dbf from S3 -  
 
 `POST: /api/s3`  
 `content-type: application/json`
