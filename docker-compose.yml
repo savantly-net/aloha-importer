@@ -2,7 +2,7 @@ version: "3"
 services:
 
   server:
-    image: net.savantly/aloha-importer
+    image: savantly/aloha-importer
     container_name: aloha-importer
     ports:
       - 8080:8080

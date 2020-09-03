@@ -1,10 +1,14 @@
 # Aloha DBF Importer  
 
 
-### Docker Compose
+### Docker
 The easiest way to get started, is to use the docker image, or docker compose file included.  
 
+`docker run savantly/aloha-importer`  
+or  
 `docker-compose up`  
+
+https://hub.docker.com/r/savantly/aloha-importer
 
 ### Usage  
 To import a dbf from S3 -  
@@ -86,7 +90,6 @@ gndxfer/101591/20190824/CAT.DBF
 The digester expects the s3 key to include the POS Key and table name, so they may be extracted with REGEX.  
 
 ### Properties  
-Be aware the backslashes are escaped.
 
 
 | Property 	| Description 	| Default 	|
