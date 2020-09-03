@@ -85,34 +85,18 @@ gndxfer/101591/20190824/CAT.DBF
 
 The digester expects the s3 key to include the POS Key and table name, so they may be extracted with REGEX.  
 
+### Properties  
+Be aware the backslashes are escaped.
 
-### aws.s3.digester.keyPatterns  
-A list of regular expressions that the S3 object key is matched against.  
-Only matches will be processed.  
-The default pattern matches keys that include a supported table name.  
 
-### aws.s3.digester.tableNameCapturePattern
-This regex pattern is applied to the S3 key to create a capture group for the table name  
+| Property 	| Description 	| Default 	|
+|-	|-	|-	|
+| aws.s3.digester.keyPatterns |  A list of regular expressions that the S3 object key is matched against. Only matches will be processed. The default pattern matches keys that include a supported table name.	| [See currently supported Aloha tables](./src/main/java/net/savantly/aloha/importer/dbf/AlohaTable.java)	|
+| aws.s3.digester.tableNameCapturePattern 	| This regex pattern is applied to the S3 key to create a capture group for the table name  	| ^(.+/)*(.+)\\.(.+)$ 	|
+| aws.s3.digester.tableNameCaptureGroup 	| This is the index of the capture group that holds the table name found by regex  	| 2 	|
+| aws.s3.digester.posKeyCapturePattern | This regex pattern is applied to the S3 key to create a capture group for the pos key | ^(\\D+/)*(\\d+){1,6}/(.+)\\.(.+)$
+| aws.s3.digester.posKeyCaptureGroup | This is the index of the capture group that holds the pos key found by regex | 2 |
+| aws.s3.digester.stopOnS3ReadException | Stop processing if there is an exception reading s3 object | true |
 
-default - tableNameCapturePattern = "^(.+/)*(.+)\\.(.+)$"  
 
-### aws.s3.digester.tableNameCaptureGroup
-This is the index of the capture group that holds the table name found by regex  
-
-default - tableNameCaptureGroup = 2
-
-### aws.s3.digester.posKeyCapturePattern 
-This regex pattern is applied to the S3 key to create a capture group for the pos key   
-
-default - posKeyCapturePattern = "^(\\D+/)*(\\d+){1,6}/(.+)\\.(.+)$"  
-
-### aws.s3.digester.posKeyCaptureGroup
-This is the index of the capture group that holds the pos key found by regex  
-
-default - posKeyCaptureGroup = 2
-
-### aws.s3.digester.stopOnS3ReadException
-Stop processing if there is an exception reading s3 object  
-
-default - stopOnS3ReadException = true  
 
