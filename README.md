@@ -43,13 +43,13 @@ spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
 ```
 
 
-[Currently supported Aloha tables](./src/main/java/net/savantly/aloha/importer/domain/common/AlohaTable.java)
+[See currently supported Aloha tables](./src/main/java/net/savantly/aloha/importer/dbf/AlohaTable.java)
 
 
 ## Bucket Digester
 A S3 Bucket digester is available to import all files matching a specific pattern -  
 
-[Default properties](./src/main/java/net/savantly/aloha/importer/aws/AwsConfig.java)  
+[See default properties](./src/main/java/net/savantly/aloha/importer/aws/AwsConfigProperties.java)  
 
 `POST: /api/s3/digest` will start the digester 
 
