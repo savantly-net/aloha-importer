@@ -53,3 +53,7 @@ bootRun {
 bootJar {
 	layered()
 }
+
+bootBuildImage {
+	imageName = "savantly/${project.name}"
+}

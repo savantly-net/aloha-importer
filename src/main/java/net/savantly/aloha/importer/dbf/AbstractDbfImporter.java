@@ -1,4 +1,4 @@
-package net.savantly.aloha.importer.domain.common;
+package net.savantly.aloha.importer.dbf;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -19,6 +19,7 @@ import com.linuxense.javadbf.DBFReader;
 import com.linuxense.javadbf.DBFRow;
 import com.linuxense.javadbf.DBFUtils;
 
+import net.savantly.aloha.importer.dbf.records.ChecksForExistingRecord;
 import net.savantly.aloha.importer.domain.importedFiles.ImportState;
 import net.savantly.aloha.importer.domain.importedFiles.ImportedFile;
 import net.savantly.aloha.importer.domain.importedFiles.ImportedFileRepository;
@@ -59,6 +60,7 @@ public abstract class AbstractDbfImporter<T extends ImportIdentifiable, ID exten
 
 		long rowCount = 0;
 		DBFReader reader = null;
+		Date importDate = new Date();
 		try {
 
 			reader = new DBFReader(request.getInput());
@@ -72,6 +74,8 @@ public abstract class AbstractDbfImporter<T extends ImportIdentifiable, ID exten
 				log.debug("importing table field: {} {}", tableFieldName, tableField.getType());
 				tableFields.put(tableFieldName, tableField);
 			}
+			
+			
 
 			// Now, lets us start reading the rows
 
@@ -87,12 +91,14 @@ public abstract class AbstractDbfImporter<T extends ImportIdentifiable, ID exten
 				}
 				T item = this.mapper.convertValue(mapRow, clazz);
 				item.setPosKey(request.getPosKey());
-				item.setImportDate(new Date());
+				item.setImportDate(importDate);
 				item.setImportId(importedFile.getId());
 				if(log.isTraceEnabled()) {
 					log.trace("importing: {}", item);
 				}
-				items.add(item);
+				if(isOkToAdd(item)) {
+					items.add(item);
+				}
 			}
 
 			// By now, we have iterated through all of the rows
@@ -109,6 +115,7 @@ public abstract class AbstractDbfImporter<T extends ImportIdentifiable, ID exten
 		if(!isError) {
 			importedFile.setStatus(ImportState.DONE);
 			importedFile.setRows(rowCount);
+			importedFile.setImportedRecords(items.size());
 			this.repo.saveAll(items);
 		}
 		
@@ -117,4 +124,42 @@ public abstract class AbstractDbfImporter<T extends ImportIdentifiable, ID exten
 		
 		return importedFile;
 	}
+
+	protected boolean isOkToAdd(T item) {
+		if(doesCheckForExistingRecord(item)) {
+			return doCheckForExistingRecord(item);
+		}
+		return true;
+	}
+
+	private boolean doesCheckForExistingRecord(T item) {
+		return ChecksForExistingRecord.class.isAssignableFrom(item.getClass());
+	}
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	private boolean doCheckForExistingRecord(T item) {
+		ChecksForExistingRecord checkedItem = (ChecksForExistingRecord)item;
+		Optional optItem = repo.findById((ID)checkedItem.getUniqueRecordIdentifier());
+		
+		//if there is
+		if(optItem.isPresent()) {
+			// check the strategy
+			switch(checkedItem.getExistingRecordStrategy()) {
+			case FAIL:
+				throw new RuntimeException("A record already exists with this ID, and the strategy is set to FAIL");
+			case SKIP_ALWAYS:
+				return false;
+			case SKIP_IF_EQUAL:
+				boolean areEqual = item.equals(optItem.get());
+				if(areEqual) {
+					return false;
+				} else return true;
+			default:
+				throw new RuntimeException("how did this happen?");
+			}
+		} else { // the record didnt already exist in the DB
+			return true;
+		}
+	}
+
 }

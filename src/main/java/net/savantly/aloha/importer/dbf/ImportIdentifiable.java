@@ -1,4 +1,4 @@
-package net.savantly.aloha.importer.domain.common;
+package net.savantly.aloha.importer.dbf;
 
 import java.util.Date;
 

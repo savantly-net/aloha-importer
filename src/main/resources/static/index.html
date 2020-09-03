@@ -14,3 +14,19 @@ content-type: application/json
 }
 ```
 </pre>
+
+
+<h2>To write an java class to the console, based on a dbf</h2>
+<pre>
+POST: /api/class-dump
+
+content-type: application/json
+
+```
+{
+	"posKey": 1234567,
+	"bucket": "my-s3-data-bucket",
+	"fileKey": "/path/to/my.dbf"
+}
+```
+</pre>

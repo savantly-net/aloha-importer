@@ -1,4 +1,4 @@
 #!/bin/bash
 
-./gradlew bootBuildImage --imageName=net.savantly/aloha-importer
-docker push net.savantly/aloha-importer
+./gradlew bootBuildImage --imageName=savantly/aloha-importer
+docker push savantly/aloha-importer

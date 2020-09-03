@@ -1,0 +1,16 @@
+version: "3"
+services:
+
+  server:
+    image: net.savantly/aloha-importer
+    container_name: aloha-importer
+    ports:
+      - 8080:8080
+    environment: 
+      - PGHOST=${PGHOST:-localhost}
+      - PGPORT=${PGPORT:-5432}
+      - PGDATABASE=${PGDATABASE}
+      - PGUSER=${PGUSER:-postgres}
+      - PGPASSWORD=${PGPASSWORD}
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}

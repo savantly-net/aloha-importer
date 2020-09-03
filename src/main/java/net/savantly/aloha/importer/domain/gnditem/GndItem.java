@@ -6,32 +6,27 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.IdClass;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.Data;
-import net.savantly.aloha.importer.domain.common.ImportIdentifiable;
+import net.savantly.aloha.importer.dbf.ImportIdentifiable;
 
 @Data
 @Entity
-@IdClass(GndItemId.class)
-@JsonIgnoreProperties(ignoreUnknown = true)
-@Table(name = "gnditem", uniqueConstraints = {@UniqueConstraint(columnNames = {"posKey", "entryid"})})
 public class GndItem implements ImportIdentifiable {
 
 	@Id
-	private Long posKey;
-	@Id
-	private Long entryid;
+	@GeneratedValue
+	private Long recordId;
 	
+	private Long posKey;
 	private Long importId;
 	private Date importDate;
-	
+
+	private Long entryid;
 	private Long type;
 	private Long employee;
 

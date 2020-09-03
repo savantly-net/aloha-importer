@@ -19,6 +19,7 @@ public class ImportedFile {
 	private String name;
 	
 	private long rows;
+	private long importedRecords;
 	
 	@Enumerated(EnumType.STRING)
 	private ImportState status;
