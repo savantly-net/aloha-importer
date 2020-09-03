@@ -62,9 +62,34 @@ aws.s3.digester.enabled=true
 aws.s3.digester.keyPatterns[0]=gndxfer/[\d]*/20190822/GNDITEM.dbf
 ```
 
+The example properties would match a single file in the following s3 key list -  
+
+```
+gndxfer/100028/20190822/MOD.DBF
+gndxfer/100028/20190822/GNDITEM.dbf
+gndxfer/100028/20190822/GNDSLSUM.DBF
+gndxfer/100028/20190822/CAT.DBF
+gndxfer/100028/20190824/MOD.DBF
+gndxfer/100028/20190824/GNDITEM.dbf
+gndxfer/100028/20190824/GNDSLSUM.DBF
+gndxfer/100028/20190824/CAT.DBF
+gndxfer/101591/20190822/MOD.DBF
+gndxfer/101591/20190822/GNDITEM.dbf
+gndxfer/101591/20190822/GNDSLSUM.DBF
+gndxfer/101591/20190822/CAT.DBF
+gndxfer/101591/20190824/MOD.DBF
+gndxfer/101591/20190824/GNDITEM.dbf
+gndxfer/101591/20190824/GNDSLSUM.DBF
+gndxfer/101591/20190824/CAT.DBF
+```
+
+The digester expects the s3 key to include the POS Key and table name, so they may be extracted with REGEX.  
+
+
 ### aws.s3.digester.keyPatterns  
 A list of regular expressions that the S3 object key is matched against.  
 Only matches will be processed.  
+The default pattern matches keys that include a supported table name.  
 
 ### aws.s3.digester.tableNameCapturePattern
 This regex pattern is applied to the S3 key to create a capture group for the table name  
