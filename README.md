@@ -36,3 +36,50 @@ spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
 
 
 [Currently supported Aloha tables](./src/main/java/net/savantly/aloha/importer/domain/common/AlohaTable.java)
+
+
+## Bucket Digester
+A S3 Bucket digester is available to import all files matching a specific pattern -  
+
+[Default properties](./src/main/java/net/savantly/aloha/importer/aws/AwsConfig.java)  
+
+`POST: /api/s3/digest` will start the digester 
+
+
+Example Properties -  
+
+```
+aws.s3.bucketName=my-s3-bucket-name
+aws.s3.digester.enabled=true
+aws.s3.digester.keyPatterns[0]=gndxfer/[\d]*/20190822/GNDITEM.dbf
+```
+
+### aws.s3.digester.keyPatterns  
+A list of regular expressions that the S3 object key is matched against.  
+Only matches will be processed.  
+
+### aws.s3.digester.tableNameCapturePattern
+This regex pattern is applied to the S3 key to create a capture group for the table name  
+
+default - tableNameCapturePattern = "^(.+/)*(.+)\\.(.+)$"  
+
+### aws.s3.digester.tableNameCaptureGroup
+This is the index of the capture group that holds the table name found by regex  
+
+default - tableNameCaptureGroup = 2
+
+### aws.s3.digester.posKeyCapturePattern 
+This regex pattern is applied to the S3 key to create a capture group for the pos key   
+
+default - posKeyCapturePattern = "^(\\D+/)*(\\d+){1,6}/(.+)\\.(.+)$"  
+
+### aws.s3.digester.posKeyCaptureGroup
+This is the index of the capture group that holds the pos key found by regex  
+
+default - posKeyCaptureGroup = 2
+
+### aws.s3.digester.stopOnS3ReadException
+Stop processing if there is an exception reading s3 object  
+
+default - stopOnS3ReadException = true  
+

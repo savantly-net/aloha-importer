@@ -1,4 +1,4 @@
-package net.savantly.aloha.importer.s3;
+package net.savantly.aloha.importer.aws.s3;
 
 import lombok.Getter;
 import lombok.Setter;

@@ -27,6 +27,7 @@ dependencies {
 	implementation 'org.springframework.data:spring-data-rest-hal-explorer'
 	
 	implementation 'software.amazon.awssdk:s3'
+	implementation 'software.amazon.awssdk:sns'
 	
 	implementation 'com.github.albfernandez:javadbf:1.11.2'
 	

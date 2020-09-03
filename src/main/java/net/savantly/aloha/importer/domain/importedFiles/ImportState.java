@@ -4,5 +4,6 @@ public enum ImportState {
 
 	DONE,
 	PROCESSING,
-	ERROR
+	ERROR,
+	REPROCESS
 }

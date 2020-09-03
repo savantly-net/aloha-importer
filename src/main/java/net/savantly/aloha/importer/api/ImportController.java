@@ -3,36 +3,38 @@ package net.savantly.aloha.importer.api;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.Arrays;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
-import net.savantly.aloha.importer.dbf.AlohaTable;
+import net.savantly.aloha.importer.aws.s3.BucketDigester;
+import net.savantly.aloha.importer.aws.s3.S3ImportRequest;
 import net.savantly.aloha.importer.dbf.DbfImporter;
 import net.savantly.aloha.importer.dbf.DbfToJava;
 import net.savantly.aloha.importer.dbf.ImportIdentifiable;
 import net.savantly.aloha.importer.dbf.ImportProcessingRequest;
-import net.savantly.aloha.importer.domain.cat.CatImporter;
-import net.savantly.aloha.importer.domain.gndadjck.GndAdjAckImporter;
-import net.savantly.aloha.importer.domain.gnddrwr.GndDrwrImporter;
-import net.savantly.aloha.importer.domain.gnditem.GndItemImporter;
-import net.savantly.aloha.importer.domain.gndline.GndLineImporter;
-import net.savantly.aloha.importer.domain.gndrevn.GndRevnImporter;
-import net.savantly.aloha.importer.domain.gndsale.GndSaleImporter;
-import net.savantly.aloha.importer.domain.gndslsum.GndSlSumImporter;
+import net.savantly.aloha.importer.dbf.ImporterBeanResolver;
+import net.savantly.aloha.importer.domain.importedFiles.ImportState;
 import net.savantly.aloha.importer.domain.importedFiles.ImportedFile;
-import net.savantly.aloha.importer.domain.mod.ModImporter;
-import net.savantly.aloha.importer.domain.modcode.ModCodeImporter;
-import net.savantly.aloha.importer.s3.S3ImportRequest;
+import net.savantly.aloha.importer.domain.importedFiles.ImportedFileRepository;
 import software.amazon.awssdk.core.ResponseInputStream;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
@@ -46,8 +48,32 @@ public class ImportController {
 	private final static Logger log = LoggerFactory.getLogger(ImportController.class);
 	
 	private final ApplicationContext context;
+	private final ImporterBeanResolver importerResolver;
 	private final S3Client s3Client;
+	private final ImportedFileRepository importedFileRepository;
 	private final DbfToJava dfToJava = new DbfToJava();
+	
+	@GetMapping({"", "/"})
+	public Page<ImportedFile> getImportedFiles(
+			@RequestParam(name = "key", required = false) String key, 
+			@RequestParam(name = "status", required = false) ImportState state,
+			Pageable page) {
+		page = Objects.nonNull(page) ? page: PageRequest.of(0, 50);
+		
+		if (Objects.nonNull(key)) {
+			Optional<ImportedFile> opt = importedFileRepository.findByName(key);
+			if(opt.isPresent()) {
+				return new PageImpl<ImportedFile>(Arrays.asList(opt.get()));
+			} else {
+				return Page.empty();
+			}
+		} else if (Objects.nonNull(state)) {
+			return importedFileRepository.findByStatus(state, page);
+		} else {
+			return importedFileRepository.findAll(page);
+		}
+		
+	}
 	
 	@PostMapping("/s3")
 	public ResponseEntity<ImportedFile> loadFromS3(@RequestBody S3ImportRequest request) throws IOException {
@@ -56,7 +82,7 @@ public class ImportController {
 				s3Client.getObject(GetObjectRequest.builder().bucket(request.getBucket()).key(request.getFileKey()).build());
 		byte[] bytes = response.readAllBytes();
 		
-		DbfImporter<? extends ImportIdentifiable, ? extends Serializable> importer = getImporter(request.getTable());
+		DbfImporter<? extends ImportIdentifiable, ? extends Serializable> importer = importerResolver.getImporter(request.getTable());
 		ImportedFile result = importer.process(new ImportProcessingRequest(new ByteArrayInputStream(bytes), request.getPosKey(), request.getFileKey()));
 		switch (result.getStatus()) {
 		case DONE: 
@@ -65,6 +91,22 @@ public class ImportController {
 			return ResponseEntity.accepted().body(result);
 		default: 
 			return ResponseEntity.badRequest().body(result);
+		}
+	}
+	
+	@PostMapping("/s3/digest")
+	public ResponseEntity<String> digestBucket(){
+		if(context.containsBean(BucketDigester.BEAN_NAME)) {
+			BucketDigester bean = this.context.getBean(BucketDigester.class);
+			Runnable r = new Runnable() {
+		         public void run() {
+		        	 bean.digest();
+		         }
+		     };
+		     new Thread(r).start();
+			return ResponseEntity.ok("started");
+		} else {
+			return ResponseEntity.ok("bucket digest is not enabled");
 		}
 	}
 	
@@ -88,30 +130,5 @@ public class ImportController {
 		return parts[parts.length-1];
 	}
 
-	private DbfImporter<? extends ImportIdentifiable, ? extends Serializable> getImporter(AlohaTable table) {
-		switch (table) {
-		case CAT:
-			return this.context.getBean(CatImporter.class);
-		case GNDADJACK:
-			return this.context.getBean(GndAdjAckImporter.class);
-		case GNDDRWR:
-			return this.context.getBean(GndDrwrImporter.class);
-		case GNDITEM:
-			return this.context.getBean(GndItemImporter.class);
-		case GNDLINE:
-			return this.context.getBean(GndLineImporter.class);
-		case GNDREVN:
-			return this.context.getBean(GndRevnImporter.class);
-		case GNDSALE:
-			return this.context.getBean(GndSaleImporter.class);
-		case GNDSLSUM:
-			return this.context.getBean(GndSlSumImporter.class);
-		case MOD:
-			return this.context.getBean(ModImporter.class);
-		case MODCODE:
-			return this.context.getBean(ModCodeImporter.class);
-		default:
-			throw new RuntimeException("couldn't find importer bean for " + table.name());
-		}
-	}
+	
 }

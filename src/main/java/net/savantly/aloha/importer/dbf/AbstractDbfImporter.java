@@ -39,11 +39,18 @@ public abstract class AbstractDbfImporter<T extends ImportIdentifiable, ID exten
 	}
 	
 	@Override
+	public Optional<ImportedFile> checkImport(String fileName) {
+		return this.importedFiles.findByName(fileName);
+	}
+	
+	@Override
 	public ImportedFile process(ImportProcessingRequest request) {
 		
 		// make sure this file hasn't been processed yet
-		Optional<ImportedFile> importCheck = this.importedFiles.findByName(request.getImportFileName());
-		if(importCheck.isPresent()) {
+		Optional<ImportedFile> importCheck = checkImport(request.getImportFileName());
+		
+		// if the state is not REPROCESS, return the previous result
+		if(importCheck.isPresent() && !importCheck.get().getStatus().equals(ImportState.REPROCESS)) {
 			log.warn("file has already been processed: {} status: {}", request.getImportFileName(), importCheck.get().getStatus());
 			return importCheck.get();
 		}
@@ -71,7 +78,9 @@ public abstract class AbstractDbfImporter<T extends ImportIdentifiable, ID exten
 			for (int i = 0; i < numberOfFields; i++) {
 				DBFField tableField = reader.getField(i);
 				String tableFieldName = tableField.getName();
-				log.debug("importing table field: {} {}", tableFieldName, tableField.getType());
+				if (log.isTraceEnabled()) {
+					log.trace("importing table field: {} {}", tableFieldName, tableField.getType());
+				}
 				tableFields.put(tableFieldName, tableField);
 			}
 			
@@ -104,7 +113,7 @@ public abstract class AbstractDbfImporter<T extends ImportIdentifiable, ID exten
 			// By now, we have iterated through all of the rows
 
 		} catch (DBFException | IllegalArgumentException | SecurityException e) {
-			log.error("{}", e);
+			log.error("error while importing", e);
 			isError = true;
 			importedFile.setStatus(ImportState.ERROR);
 			
