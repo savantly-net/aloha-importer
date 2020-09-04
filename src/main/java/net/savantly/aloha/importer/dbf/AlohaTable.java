@@ -12,5 +12,7 @@ public enum AlohaTable {
 	GNDSLSUM,
 	MOD,
 	MODCODE,
-	ODR
+	ODR,
+	TAX,
+	TDR
 }
