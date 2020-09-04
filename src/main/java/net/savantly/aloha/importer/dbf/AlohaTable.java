@@ -10,6 +10,7 @@ public enum AlohaTable {
 	GNDREVN,
 	GNDSALE,
 	GNDSLSUM,
+	GNDVOID,
 	MOD,
 	MODCODE,
 	ODR,

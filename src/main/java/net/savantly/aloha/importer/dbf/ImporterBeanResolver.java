@@ -13,6 +13,7 @@ import net.savantly.aloha.importer.domain.gndline.GndLineImporter;
 import net.savantly.aloha.importer.domain.gndrevn.GndRevnImporter;
 import net.savantly.aloha.importer.domain.gndsale.GndSaleImporter;
 import net.savantly.aloha.importer.domain.gndslsum.GndSlSumImporter;
+import net.savantly.aloha.importer.domain.gndvoid.GndVoidImporter;
 import net.savantly.aloha.importer.domain.mod.ModImporter;
 import net.savantly.aloha.importer.domain.modcode.ModCodeImporter;
 import net.savantly.aloha.importer.domain.odr.OrderModeImporter;
@@ -46,6 +47,8 @@ public class ImporterBeanResolver {
 			return this.context.getBean(GndSaleImporter.class);
 		case GNDSLSUM:
 			return this.context.getBean(GndSlSumImporter.class);
+		case GNDVOID:
+			return this.context.getBean(GndVoidImporter.class);
 		case MOD:
 			return this.context.getBean(ModImporter.class);
 		case MODCODE:
