@@ -15,6 +15,7 @@ import net.savantly.aloha.importer.domain.gndsale.GndSaleImporter;
 import net.savantly.aloha.importer.domain.gndslsum.GndSlSumImporter;
 import net.savantly.aloha.importer.domain.mod.ModImporter;
 import net.savantly.aloha.importer.domain.modcode.ModCodeImporter;
+import net.savantly.aloha.importer.domain.odr.OrderModeImporter;
 
 @Service
 public class ImporterBeanResolver {
@@ -47,6 +48,8 @@ public class ImporterBeanResolver {
 			return this.context.getBean(ModImporter.class);
 		case MODCODE:
 			return this.context.getBean(ModCodeImporter.class);
+		case ODR:
+			return this.context.getBean(OrderModeImporter.class);
 		default:
 			throw new RuntimeException("couldn't find importer bean for " + table.name());
 		}

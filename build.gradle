@@ -53,6 +53,7 @@ bootRun {
 
 bootJar {
 	layered()
+	exclude("**/application-local.properties")
 }
 
 bootBuildImage {
