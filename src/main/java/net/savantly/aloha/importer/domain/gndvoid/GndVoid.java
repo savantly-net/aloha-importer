@@ -30,6 +30,7 @@ public class GndVoid implements ImportIdentifiable {
 
 	private Long manager;
 
+	@Column(name = "item_check")
 	private Long check;
 	@Column(length = 15)
 	private String tablename;
