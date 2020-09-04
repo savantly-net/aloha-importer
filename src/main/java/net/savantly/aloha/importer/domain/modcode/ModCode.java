@@ -37,7 +37,7 @@ public class ModCode implements ChecksForExistingRecord<Long> {
 	@Id
 	private Long number;
 	
-	@Column(length = 20)
+	@Column(length = 20, name = "item_desc")
 	private String desc;
 	@Column(length = 20)
 	private String mod_name;

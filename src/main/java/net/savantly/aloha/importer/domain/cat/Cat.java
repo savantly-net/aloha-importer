@@ -43,7 +43,7 @@ public class Cat implements ChecksForExistingRecord<CatId> {
 	private Long usernumber;
 	@Column(length = 20)
 	private String name;
-	@Column(length = 40)
+	@Column(length = 40, name = "item_desc")
 	private String desc;
 	@Column(length = 20)
 	private String parent;
