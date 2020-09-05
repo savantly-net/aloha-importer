@@ -6,6 +6,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
 import net.savantly.aloha.importer.domain.cat.CatImporter;
+import net.savantly.aloha.importer.domain.cmp.CompImporter;
 import net.savantly.aloha.importer.domain.gndadjck.GndAdjAckImporter;
 import net.savantly.aloha.importer.domain.gnddrwr.GndDrwrImporter;
 import net.savantly.aloha.importer.domain.gnditem.GndItemImporter;
@@ -36,6 +37,8 @@ public class ImporterBeanResolver {
 		switch (table) {
 		case CAT:
 			return this.context.getBean(CatImporter.class);
+		case CMP:
+			return this.context.getBean(CompImporter.class);
 		case GNDADJACK:
 			return this.context.getBean(GndAdjAckImporter.class);
 		case GNDDRWR:
