@@ -19,6 +19,7 @@ import net.savantly.aloha.importer.domain.itm.ItemImporter;
 import net.savantly.aloha.importer.domain.mod.ModImporter;
 import net.savantly.aloha.importer.domain.modcode.ModCodeImporter;
 import net.savantly.aloha.importer.domain.odr.OrderModeImporter;
+import net.savantly.aloha.importer.domain.pet.PettyCashImporter;
 import net.savantly.aloha.importer.domain.tax.TaxImporter;
 import net.savantly.aloha.importer.domain.tdr.TdrImporter;
 
@@ -61,6 +62,8 @@ public class ImporterBeanResolver {
 			return this.context.getBean(ModCodeImporter.class);
 		case ODR:
 			return this.context.getBean(OrderModeImporter.class);
+		case PET:
+			return this.context.getBean(PettyCashImporter.class);
 		case TAX:
 			return this.context.getBean(TaxImporter.class);
 		case TDR:

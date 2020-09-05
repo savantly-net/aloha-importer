@@ -16,6 +16,7 @@ public enum AlohaTable {
 	MOD,
 	MODCODE,
 	ODR,
+	PET,
 	TAX,
 	TDR
 }
