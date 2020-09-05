@@ -6,6 +6,7 @@ public enum AlohaTable {
 	CMP,
 	GNDADJACK,
 	GNDDRWR,
+	GNDDEPST,
 	GNDITEM,
 	GNDLBSUM,
 	GNDLINE, 

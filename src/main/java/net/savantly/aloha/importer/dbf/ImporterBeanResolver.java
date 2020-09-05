@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import net.savantly.aloha.importer.domain.cat.CatImporter;
 import net.savantly.aloha.importer.domain.cmp.CompImporter;
 import net.savantly.aloha.importer.domain.gndadjck.GndAdjAckImporter;
+import net.savantly.aloha.importer.domain.gnddepst.GndDepstImporter;
 import net.savantly.aloha.importer.domain.gnddrwr.GndDrwrImporter;
 import net.savantly.aloha.importer.domain.gnditem.GndItemImporter;
 import net.savantly.aloha.importer.domain.gndlbsum.GndLbSumImporter;
@@ -41,6 +42,8 @@ public class ImporterBeanResolver {
 			return this.context.getBean(CompImporter.class);
 		case GNDADJACK:
 			return this.context.getBean(GndAdjAckImporter.class);
+		case GNDDEPST:
+			return this.context.getBean(GndDepstImporter.class);
 		case GNDDRWR:
 			return this.context.getBean(GndDrwrImporter.class);
 		case GNDITEM:
