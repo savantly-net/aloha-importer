@@ -123,7 +123,7 @@ public class DbfToJava {
 		}
 	}
 
-	List<String> likelyDecimalNames = Arrays.asList("price", "amt", "amount", "cost", "charge", "delta", "change", "chg", "money", "tax");
+	List<String> likelyDecimalNames = Arrays.asList("price", "amt", "amount", "cost", "charge", "delta", "change", "chg", "money", "tax", "sale");
 	private boolean soundsLikeDecimal(String name) {
 		for (String string : likelyDecimalNames) {
 			if(name.contains(string)) {

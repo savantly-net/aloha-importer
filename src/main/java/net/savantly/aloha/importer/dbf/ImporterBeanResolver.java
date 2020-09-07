@@ -5,8 +5,10 @@ import java.io.Serializable;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
+import net.savantly.aloha.importer.domain.adjtime.AdjustedTimeImporter;
 import net.savantly.aloha.importer.domain.cat.CatImporter;
 import net.savantly.aloha.importer.domain.cmp.CompImporter;
+import net.savantly.aloha.importer.domain.emp.EmployeeImporter;
 import net.savantly.aloha.importer.domain.gndadjck.GndAdjAckImporter;
 import net.savantly.aloha.importer.domain.gnddepst.GndDepstImporter;
 import net.savantly.aloha.importer.domain.gnddrwr.GndDrwrImporter;
@@ -36,10 +38,14 @@ public class ImporterBeanResolver {
 
 	public DbfImporter<? extends ImportIdentifiable, ? extends Serializable> getImporter(AlohaTable table) {
 		switch (table) {
+		case ADJTIME:
+			return this.context.getBean(AdjustedTimeImporter.class);
 		case CAT:
 			return this.context.getBean(CatImporter.class);
 		case CMP:
 			return this.context.getBean(CompImporter.class);
+		case EMP:
+			return this.context.getBean(EmployeeImporter.class);
 		case GNDADJACK:
 			return this.context.getBean(GndAdjAckImporter.class);
 		case GNDDEPST:

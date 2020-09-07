@@ -2,8 +2,10 @@ package net.savantly.aloha.importer.dbf;
 
 public enum AlohaTable {
 	
+	ADJTIME,
 	CAT,
 	CMP,
+	EMP,
 	GNDADJACK,
 	GNDDRWR,
 	GNDDEPST,
