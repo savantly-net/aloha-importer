@@ -9,6 +9,7 @@ import net.savantly.aloha.importer.domain.adjtime.AdjustedTimeImporter;
 import net.savantly.aloha.importer.domain.cat.CatImporter;
 import net.savantly.aloha.importer.domain.cmp.CompImporter;
 import net.savantly.aloha.importer.domain.emp.EmployeeImporter;
+import net.savantly.aloha.importer.domain.gif.GiftCardImporter;
 import net.savantly.aloha.importer.domain.gndadjck.GndAdjAckImporter;
 import net.savantly.aloha.importer.domain.gnddepst.GndDepstImporter;
 import net.savantly.aloha.importer.domain.gnddrwr.GndDrwrImporter;
@@ -46,6 +47,8 @@ public class ImporterBeanResolver {
 			return this.context.getBean(CompImporter.class);
 		case EMP:
 			return this.context.getBean(EmployeeImporter.class);
+		case GIF:
+			return this.context.getBean(GiftCardImporter.class);
 		case GNDADJACK:
 			return this.context.getBean(GndAdjAckImporter.class);
 		case GNDDEPST:

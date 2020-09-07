@@ -6,6 +6,7 @@ public enum AlohaTable {
 	CAT,
 	CMP,
 	EMP,
+	GIF,
 	GNDADJACK,
 	GNDDRWR,
 	GNDDEPST,
