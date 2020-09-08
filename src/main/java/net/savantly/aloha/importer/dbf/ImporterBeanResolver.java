@@ -19,12 +19,14 @@ import net.savantly.aloha.importer.domain.gndline.GndLineImporter;
 import net.savantly.aloha.importer.domain.gndrevn.GndRevnImporter;
 import net.savantly.aloha.importer.domain.gndsale.GndSaleImporter;
 import net.savantly.aloha.importer.domain.gndslsum.GndSlSumImporter;
+import net.savantly.aloha.importer.domain.gndtndr.GndTndrImporter;
 import net.savantly.aloha.importer.domain.gndvoid.GndVoidImporter;
 import net.savantly.aloha.importer.domain.itm.ItemImporter;
 import net.savantly.aloha.importer.domain.mod.ModImporter;
 import net.savantly.aloha.importer.domain.modcode.ModCodeImporter;
 import net.savantly.aloha.importer.domain.odr.OrderModeImporter;
 import net.savantly.aloha.importer.domain.pet.PettyCashImporter;
+import net.savantly.aloha.importer.domain.pro.PromoImporter;
 import net.savantly.aloha.importer.domain.tax.TaxImporter;
 import net.savantly.aloha.importer.domain.tdr.TdrImporter;
 
@@ -67,6 +69,8 @@ public class ImporterBeanResolver {
 			return this.context.getBean(GndSaleImporter.class);
 		case GNDSLSUM:
 			return this.context.getBean(GndSlSumImporter.class);
+		case GNDTNDR:
+			return this.context.getBean(GndTndrImporter.class);
 		case GNDVOID:
 			return this.context.getBean(GndVoidImporter.class);
 		case ITM:
@@ -79,6 +83,8 @@ public class ImporterBeanResolver {
 			return this.context.getBean(OrderModeImporter.class);
 		case PET:
 			return this.context.getBean(PettyCashImporter.class);
+		case PRO:
+			return this.context.getBean(PromoImporter.class);
 		case TAX:
 			return this.context.getBean(TaxImporter.class);
 		case TDR:

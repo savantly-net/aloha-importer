@@ -16,12 +16,14 @@ public enum AlohaTable {
 	GNDREVN,
 	GNDSALE,
 	GNDSLSUM,
+	GNDTNDR,
 	GNDVOID,
 	ITM,
 	MOD,
 	MODCODE,
 	ODR,
 	PET,
+	PRO,
 	TAX,
 	TDR
 }

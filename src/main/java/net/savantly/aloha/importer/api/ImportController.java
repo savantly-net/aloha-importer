@@ -75,6 +75,15 @@ public class ImportController {
 		
 	}
 	
+	@PostMapping("/state/error/reprocess")
+	public ResponseEntity<Iterable<ImportedFile>> setErrorStateToReprocess(){
+		Page<ImportedFile> files = this.importedFileRepository.findByStatus(ImportState.ERROR, Pageable.unpaged());
+		files.forEach(f -> {
+			f.setStatus(ImportState.REPROCESS);
+		});
+		return ResponseEntity.ok(this.importedFileRepository.saveAll(files));
+	}
+	
 	@PostMapping("/s3")
 	public ResponseEntity<ImportedFile> loadFromS3(@RequestBody S3ImportRequest request) throws IOException {
 
