@@ -13,7 +13,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.repository.CrudRepository;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.linuxense.javadbf.DBFException;
 import com.linuxense.javadbf.DBFField;
 import com.linuxense.javadbf.DBFReader;
 import com.linuxense.javadbf.DBFRow;
@@ -57,7 +56,8 @@ public abstract class AbstractDbfImporter<T extends ImportIdentifiable, ID exten
 		
 		log.info("beginning import of: {}", request.getImportFileName());
 		
-		ImportedFile importedFile = new ImportedFile();
+		// use the existing REPROCESS record or create a new record
+		ImportedFile importedFile = importCheck.orElse(new ImportedFile());
 		importedFile.setName(request.getImportFileName());
 		importedFile.setStatus(ImportState.PROCESSING);
 		importedFile = this.importedFiles.save(importedFile);
@@ -112,7 +112,7 @@ public abstract class AbstractDbfImporter<T extends ImportIdentifiable, ID exten
 
 			// By now, we have iterated through all of the rows
 
-		} catch (DBFException | IllegalArgumentException | SecurityException e) {
+		} catch (Exception e) {
 			log.error("error while importing", e);
 			isError = true;
 			importedFile.setStatus(ImportState.ERROR);

@@ -16,20 +16,22 @@ import net.savantly.aloha.importer.dbf.ImportIdentifiable;
 @IdClass(GndTndrId.class)
 public class GndTndr implements ImportIdentifiable {
 	
-	@Id
-	private Long id;
 
 	@Id
 	private Long posKey;
 	private Long importId;
 	private Date importDate;
 
+	@Id
+	private Long id;
+	@Id
+	private Date date;
+
 	private Long employee;
 
 	@Column(name = "item_check")
 	private Long check;
 
-	private Date date;
 
 	private Date sysdate;
 
