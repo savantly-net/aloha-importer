@@ -55,13 +55,13 @@ public class ImportController {
 	
 	@GetMapping({"", "/"})
 	public Page<ImportedFile> getImportedFiles(
-			@RequestParam(name = "key", required = false) String key, 
+			@RequestParam(name = "name", required = false) String name, 
 			@RequestParam(name = "status", required = false) ImportState state,
 			Pageable page) {
 		page = Objects.nonNull(page) ? page: PageRequest.of(0, 50);
 		
-		if (Objects.nonNull(key)) {
-			Optional<ImportedFile> opt = importedFileRepository.findByName(key);
+		if (Objects.nonNull(name)) {
+			Optional<ImportedFile> opt = importedFileRepository.findByName(name);
 			if(opt.isPresent()) {
 				return new PageImpl<ImportedFile>(Arrays.asList(opt.get()));
 			} else {
