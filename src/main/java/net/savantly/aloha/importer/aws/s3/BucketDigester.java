@@ -67,7 +67,7 @@ public class BucketDigester {
 				
 				ListObjectsV2Iterable objectPages = s3.listObjectsV2Paginator(ListObjectsV2Request.builder().bucket(props.getS3().getBucketName()).build());
 				objectPages.stream().forEach(page -> {
-					page.contents().forEach(object -> {
+					page.contents().parallelStream().forEach(object -> {
 						final String key = object.key();
 						if(eligibleKey(key)) {
 							processedCount.getAndIncrement();

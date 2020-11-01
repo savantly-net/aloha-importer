@@ -19,16 +19,20 @@ public class GndLine implements ChecksForExistingRecord<GndLineId> {
 
 	@Id
 	private Long posKey;
-	private Long importId;
-	private Date importDate;
-
+	@Id
+	private Date dob;
+	@Id
+	private Long entryid;
 	@Id
 	private Long id;
+	
+	private Long importId;
+	private Date importDate;
 	
 	@Transient
 	@Override
 	public GndLineId getUniqueRecordIdentifier() {
-		return new GndLineId().setId(itemid).setPosKey(posKey);
+		return new GndLineId().setPosKey(posKey).setDob(dob).setEntryid(entryid);
 	}
 
 	@Transient
@@ -55,11 +59,7 @@ public class GndLine implements ChecksForExistingRecord<GndLineId> {
 
 	private Long unit;
 
-	private Date dob;
-
 	private Date sysdate;
-
-	private Long entryid;
 
 	private Long occasion;
 
