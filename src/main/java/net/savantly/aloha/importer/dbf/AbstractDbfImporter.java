@@ -162,7 +162,10 @@ public abstract class AbstractDbfImporter<T extends ImportIdentifiable, ID exten
 				boolean areEqual = item.equals(optItem.get());
 				if(areEqual) {
 					return false;
-				} else return true;
+				} else {
+					repo.save(item);
+					return false;
+				}
 			default:
 				throw new RuntimeException("how did this happen?");
 			}
