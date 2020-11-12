@@ -163,6 +163,7 @@ public abstract class AbstractDbfImporter<T extends ImportIdentifiable, ID exten
 				if(areEqual) {
 					return false;
 				} else {
+					repo.delete((T)optItem.get());
 					repo.save(item);
 					return false;
 				}
