@@ -116,6 +116,7 @@ public abstract class AbstractDbfImporter<T extends ImportIdentifiable, ID exten
 			log.error("error while importing", e);
 			isError = true;
 			importedFile.setStatus(ImportState.ERROR);
+			importedFile.setErrorMessage(e.toString());
 			
 		} finally {
 			DBFUtils.close(reader);
@@ -125,7 +126,13 @@ public abstract class AbstractDbfImporter<T extends ImportIdentifiable, ID exten
 			importedFile.setStatus(ImportState.DONE);
 			importedFile.setRows(rowCount);
 			importedFile.setImportedRecords(items.size());
-			this.repo.saveAll(items);
+			try {
+				this.repo.saveAll(items);
+			} catch (Exception e) {
+				log.error("error while importing", e);
+				importedFile.setStatus(ImportState.ERROR);
+				importedFile.setErrorMessage(e.toString());
+			}
 		}
 		
 		// Save the result status of the import

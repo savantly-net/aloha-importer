@@ -1,5 +1,6 @@
 package net.savantly.aloha.importer.domain.importedFiles;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -25,4 +26,7 @@ public class ImportedFile {
 	
 	@Enumerated(EnumType.STRING)
 	private ImportState status;
+	
+	@Column(length = 1000)
+	private String errorMessage;
 }
