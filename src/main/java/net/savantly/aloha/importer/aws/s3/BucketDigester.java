@@ -3,9 +3,11 @@ package net.savantly.aloha.importer.aws.s3;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -65,8 +67,15 @@ public class BucketDigester {
 				AtomicInteger processedCount = new AtomicInteger(0);
 				AtomicInteger skippedCount = new AtomicInteger(0);
 				
-				ListObjectsV2Iterable objectPages = s3.listObjectsV2Paginator(ListObjectsV2Request.builder().bucket(props.getS3().getBucketName()).build());
+				ListObjectsV2Iterable objectPages = s3.listObjectsV2Paginator(
+						ListObjectsV2Request.builder()
+							.bucket(props.getS3().getBucketName())
+							.maxKeys(props.getS3().getDigester().getMaxPerPage())
+							.delimiter(props.getS3().getDigester().getDelimiter())
+							.prefix(props.getS3().getDigester().getPrefix())
+							.build());
 				objectPages.stream().forEach(page -> {
+					final ArrayList<CompletableFuture<ImportedFile>> completables = new ArrayList<>();
 					page.contents().parallelStream().forEach(object -> {
 						final String key = object.key();
 						if(eligibleKey(key)) {
@@ -74,8 +83,8 @@ public class BucketDigester {
 							final AlohaTable table = extractTableName(key);
 							final Long posKey = extractPosKey(key);
 
-							DbfImporter<? extends ImportIdentifiable, ? extends Serializable> dbfImporter = this.importerResolver.getImporter(table);
-							Optional<ImportedFile> check = dbfImporter.checkImport(key);
+							final DbfImporter<? extends ImportIdentifiable, ? extends Serializable> dbfImporter = this.importerResolver.getImporter(table);
+							final Optional<ImportedFile> check = dbfImporter.checkImport(key);
 							
 							if(check.isPresent() && !check.get().getStatus().equals(ImportState.REPROCESS)) {
 								log.debug("file already imported: " + key);
@@ -84,13 +93,17 @@ public class BucketDigester {
 									log.info("reprocessing file: " + key);
 								}
 								
-								ResponseInputStream<GetObjectResponse> response = 
+								final ResponseInputStream<GetObjectResponse> response = 
 										s3.getObject(GetObjectRequest.builder().bucket(props.getS3().getBucketName()).key(key).build());
 								try {
 									byte[] bytes = response.readAllBytes();
-									ImportProcessingRequest importRequest = new ImportProcessingRequest(
+									final ImportProcessingRequest importRequest = new ImportProcessingRequest(
 											new ByteArrayInputStream(bytes), posKey, key);
-									dbfImporter.process(importRequest );
+									final CompletableFuture<ImportedFile> completable = dbfImporter.process(importRequest);
+									if (Objects.isNull(completable)) {
+										throw new RuntimeException("dbfImporter.process return null. key:" + key);
+									}
+									completables.add(completable);
 								} catch (IOException e) {
 									if (props.getS3().getDigester().isStopOnS3ReadException()) {
 										throw new RuntimeException("failed to read s3 object: " + key);
@@ -102,6 +115,15 @@ public class BucketDigester {
 							skippedCount.getAndIncrement();
 						}
 					});
+					// If this page contained files to process
+					if (completables.size() > 0) {
+						CompletableFuture<Void> completablePage = 
+								CompletableFuture.allOf(completables.toArray(new CompletableFuture[completables.size()]));
+						completablePage.join();
+						if (completablePage.isCompletedExceptionally()) {
+							throw new RuntimeException("failed. check logs");
+						}
+					}
 				});
 
 				log.info(String.format("completed s3 digest. processed: %s skipped: %s", processedCount.get(), skippedCount.get()));

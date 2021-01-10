@@ -1,5 +1,7 @@
 # Aloha DBF Importer  
 
+A multi-threaded DBF importer with classes that correspond to the Aloha POS table structure.  
+
 
 ### Docker
 The easiest way to get started, is to use the docker image, or docker compose file included.  
@@ -100,6 +102,13 @@ The digester expects the s3 key to include the POS Key and table name, so they m
 | aws.s3.digester.posKeyCapturePattern | This regex pattern is applied to the S3 key to create a capture group for the pos key | ^(\\D+/)*(\\d+){1,6}/(.+)\\.(.+)$
 | aws.s3.digester.posKeyCaptureGroup | This is the index of the capture group that holds the pos key found by regex | 2 |
 | aws.s3.digester.stopOnS3ReadException | Stop processing if there is an exception reading s3 object | true |
+| aws.s3.digester.maxPerPage | maximum number of keys/files in each page. Impacts the thread queue. | 50 |
+| aws.s3.digester.prefix | prefix the s3 queries to limit the search path |  |
+| aws.s3.digester.delimiter | delimiter  used in s3 queries to indicate folder paths | / |
+| async.corePoolSize | starting size of the thread pool | 2 |
+| async.maxPoolSize | maximum size of the thread pool | 2 |
+| async.queueCapacity | max queued requests | 100 |
+| async.threadNamePrefix | prefix of name for each spawned thread | AlohaImport- |
 
 
 

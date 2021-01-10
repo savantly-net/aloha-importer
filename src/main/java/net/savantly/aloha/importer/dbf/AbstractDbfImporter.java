@@ -7,10 +7,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.transaction.Transactional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.scheduling.annotation.Async;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.linuxense.javadbf.DBFField;
@@ -23,6 +29,7 @@ import net.savantly.aloha.importer.domain.importedFiles.ImportState;
 import net.savantly.aloha.importer.domain.importedFiles.ImportedFile;
 import net.savantly.aloha.importer.domain.importedFiles.ImportedFileRepository;
 
+@Transactional
 public abstract class AbstractDbfImporter<T extends ImportIdentifiable, ID extends Serializable> implements DbfImporter<T, ID> {
 	
 	private final Logger log = LoggerFactory.getLogger(this.getClass());
@@ -30,6 +37,9 @@ public abstract class AbstractDbfImporter<T extends ImportIdentifiable, ID exten
 	private final CrudRepository<T, ID> repo;
 	private final ImportedFileRepository importedFiles;
 	private final Class<T> clazz;
+	
+	@PersistenceContext
+	private EntityManager em;
 
 	public AbstractDbfImporter(CrudRepository<T, ID> repo, ImportedFileRepository importedFiles, Class<T> clazz) {
 		this.repo = repo;
@@ -43,7 +53,8 @@ public abstract class AbstractDbfImporter<T extends ImportIdentifiable, ID exten
 	}
 	
 	@Override
-	public ImportedFile process(ImportProcessingRequest request) {
+	@Async
+    public CompletableFuture<ImportedFile> process(ImportProcessingRequest request) {
 		
 		// make sure this file hasn't been processed yet
 		Optional<ImportedFile> importCheck = checkImport(request.getImportFileName());
@@ -51,7 +62,7 @@ public abstract class AbstractDbfImporter<T extends ImportIdentifiable, ID exten
 		// if the state is not REPROCESS, return the previous result
 		if(importCheck.isPresent() && !importCheck.get().getStatus().equals(ImportState.REPROCESS)) {
 			log.warn("file has already been processed: {} status: {}", request.getImportFileName(), importCheck.get().getStatus());
-			return importCheck.get();
+			return CompletableFuture.completedFuture(importCheck.get());
 		}
 		
 		log.info("beginning import of: {}", request.getImportFileName());
@@ -61,6 +72,8 @@ public abstract class AbstractDbfImporter<T extends ImportIdentifiable, ID exten
 		importedFile.setName(request.getImportFileName());
 		importedFile.setStatus(ImportState.PROCESSING);
 		importedFile = this.importedFiles.save(importedFile);
+		em.flush();
+		
 		
 		List<T> items = new ArrayList<T>();
 		boolean isError = false;
@@ -138,7 +151,7 @@ public abstract class AbstractDbfImporter<T extends ImportIdentifiable, ID exten
 		// Save the result status of the import
 		this.importedFiles.save(importedFile);
 		
-		return importedFile;
+		return CompletableFuture.completedFuture(importedFile);
 	}
 
 	protected boolean isOkToAdd(T item) {

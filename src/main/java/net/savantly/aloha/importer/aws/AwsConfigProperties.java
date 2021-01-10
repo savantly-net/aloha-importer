@@ -65,6 +65,22 @@ public class AwsConfigProperties {
 		 * Stop processing if there is an exception reading s3 object
 		 */
 		private boolean stopOnS3ReadException = true;
+		
+		/**
+		 * Maximum number of keys [files] in each page of the s3 requests.  
+		 * If this is increased, you will need to increase the async queue size property. <br/>{@code async.queueCapacity}
+		 */
+		private int maxPerPage = 50;
+		
+		/**
+		 * Use a prefix when listing s3 bucket to limit results
+		 */
+		private String prefix = "";
+		
+		/**
+		 * s3 key delimiter 
+		 */
+		private String delimiter = "/";
 	}
 
 }

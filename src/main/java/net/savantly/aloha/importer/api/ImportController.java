@@ -6,6 +6,7 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -92,14 +93,15 @@ public class ImportController {
 		byte[] bytes = response.readAllBytes();
 		
 		DbfImporter<? extends ImportIdentifiable, ? extends Serializable> importer = importerResolver.getImporter(request.getTable());
-		ImportedFile result = importer.process(new ImportProcessingRequest(new ByteArrayInputStream(bytes), request.getPosKey(), request.getFileKey()));
-		switch (result.getStatus()) {
+		CompletableFuture<ImportedFile> result = importer.process(new ImportProcessingRequest(new ByteArrayInputStream(bytes), request.getPosKey(), request.getFileKey()));
+		ImportedFile importedFile = result.join();
+		switch (importedFile.getStatus()) {
 		case DONE: 
-			return ResponseEntity.ok(result);
+			return ResponseEntity.ok(importedFile);
 		case PROCESSING:
-			return ResponseEntity.accepted().body(result);
+			return ResponseEntity.accepted().body(importedFile);
 		default: 
-			return ResponseEntity.badRequest().body(result);
+			return ResponseEntity.badRequest().body(importedFile);
 		}
 	}
 	
