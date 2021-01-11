@@ -11,7 +11,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Configuration
-@ConfigurationProperties("aync")
+@ConfigurationProperties("async")
 @Setter
 @Getter
 public class AsyncConfiguration {

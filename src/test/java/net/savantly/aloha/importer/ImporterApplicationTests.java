@@ -34,6 +34,9 @@ class ImporterApplicationTests {
 	@Value("classpath:/CAT.dbf")
 	Resource catFile;
 
+	@Value("classpath:/TDR.dbf")
+	Resource tdrFile;
+
 	@Value("classpath:/GNDITEM.dbf")
 	Resource gndItemFile;
 
@@ -53,6 +56,15 @@ class ImporterApplicationTests {
 	}
 
 	@Test
+	void importTDR() throws IOException {
+		String fileName = "TDR.dbf";
+		CompletableFuture<ImportedFile> result = importFile(fileName, AlohaTable.TDR, tdrFile);
+		result.join();
+		Assertions.assertTrue(result.isDone());
+		Assertions.assertFalse(result.isCompletedExceptionally());
+	}
+
+	@Test
 	void importGNDITEM() throws IOException {
 		String fileName = "GNDITEM.dbf";
 		CompletableFuture<ImportedFile> result = importFile(fileName, AlohaTable.GNDITEM, gndItemFile);
@@ -62,17 +74,43 @@ class ImporterApplicationTests {
 	}
 	
 	@Test
-	void multiThread() throws IOException {
+	void multiThreadStress() throws IOException {
 
 		ArrayList<CompletableFuture<ImportedFile>> completables = new ArrayList<>();
-		for (int i = 0; i < 50; i++) {
+		
+		for (int i = 0; i < 15; i++) {
 			
 			final String catFileName = String.format("CAT_%s", i);
 			completables.add(importFile(catFileName, AlohaTable.CAT, catFile));
 
 			final String gndItemFileName = String.format("GNDITEM_%s", i);
 			completables.add(importFile(gndItemFileName, AlohaTable.GNDITEM, gndItemFile));
+
+			final String tdrFileName = String.format("TDRITEM_%s", i);
+			completables.add(importFile(tdrFileName, AlohaTable.TDR, tdrFile));
 		}
+		
+
+		// these should come back as already processed
+		for (int i = 0; i < 10; i++) {
+			
+			final String catFileName = String.format("CAT_%s", i);
+			completables.add(importFile(catFileName, AlohaTable.CAT, catFile));
+
+			final String gndItemFileName = String.format("GNDITEM_%s", i);
+			completables.add(importFile(gndItemFileName, AlohaTable.GNDITEM, gndItemFile));
+
+			final String tdrFileName = String.format("TDRITEM_%s", i);
+			completables.add(importFile(tdrFileName, AlohaTable.TDR, tdrFile));
+
+		}
+		
+		// add several of the same to try triggering race condition
+		for (int i = 40; i < 60; i++) {
+			final String tdrFileName = String.format("TDRITEM_%s", i);
+			completables.add(importFile(tdrFileName, AlohaTable.TDR, tdrFile));
+		}
+		
 		CompletableFuture<Void> result = CompletableFuture.allOf(completables.toArray(new CompletableFuture[20]));
 		log.info("exception: {}", result.isCompletedExceptionally());
 		log.info("done: {}", result.isDone());

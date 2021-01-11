@@ -1,0 +1,15 @@
+<ehcache>
+	<defaultCache
+            name="defaut"
+            maxElementsInMemory="10"
+            eternal="false"
+            timeToIdleSeconds="20"
+            timeToLiveSeconds="20"
+            overflowToDisk="false"
+            diskPersistent="false"
+            memoryStoreEvictionPolicy="LRU"
+            />    
+    <!-- configure specific caches
+    <cache name="net.savantly.aloha.importer.domain.tdr.Tdr" maxElementsInMemory="25" />
+     -->
+</ehcache>

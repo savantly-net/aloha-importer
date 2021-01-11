@@ -31,7 +31,7 @@ This code expects that you have AWS credentials set up per:
 
 http://docs.aws.amazon.com/java-sdk/latest/developer-guide/setup-credentials.html  
 
-Set the AWS region in the appliction properties -  
+Set the AWS region in the application properties -  
 `aws.region=us-east-1`
 
 Or as an env var -  

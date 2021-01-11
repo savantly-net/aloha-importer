@@ -26,6 +26,8 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.data:spring-data-rest-hal-explorer'
 	
+	implementation 'org.hibernate:hibernate-ehcache'
+					
 	implementation 'software.amazon.awssdk:s3'
 	implementation 'software.amazon.awssdk:sns'
 	

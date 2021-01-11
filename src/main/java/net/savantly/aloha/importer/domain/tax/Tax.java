@@ -8,6 +8,9 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.IdClass;
 
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.springframework.cache.annotation.Cacheable;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import net.savantly.aloha.importer.dbf.ImportIdentifiable;
@@ -16,6 +19,8 @@ import net.savantly.aloha.importer.dbf.ImportIdentifiable;
 @Entity
 @IdClass(TaxId.class)
 @EqualsAndHashCode(exclude = { "importId", "importDate" })
+@Cacheable
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class Tax implements ImportIdentifiable {
 
 	@Id

@@ -7,6 +7,9 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.IdClass;
 
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.springframework.cache.annotation.Cacheable;
+
 import lombok.Data;
 import net.savantly.aloha.importer.dbf.ImportIdentifiable;
 
@@ -14,6 +17,8 @@ import net.savantly.aloha.importer.dbf.ImportIdentifiable;
 @Data
 @Entity
 @IdClass(PettyCashId.class)
+@Cacheable
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class PettyCash implements ImportIdentifiable {
 
 	@Id

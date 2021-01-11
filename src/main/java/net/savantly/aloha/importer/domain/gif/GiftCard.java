@@ -7,6 +7,9 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.springframework.cache.annotation.Cacheable;
+
 import lombok.Data;
 import net.savantly.aloha.importer.dbf.ImportIdentifiable;
 
@@ -18,6 +21,8 @@ import net.savantly.aloha.importer.dbf.ImportIdentifiable;
  */
 @Data
 @Entity
+@Cacheable
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class GiftCard implements ImportIdentifiable {
 
 	private Long posKey;

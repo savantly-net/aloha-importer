@@ -8,6 +8,9 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.IdClass;
 
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.springframework.cache.annotation.Cacheable;
+
 import lombok.Data;
 import net.savantly.aloha.importer.dbf.records.ChecksForExistingRecord;
 import net.savantly.aloha.importer.dbf.records.ExistingRecordStrategy;
@@ -15,6 +18,8 @@ import net.savantly.aloha.importer.dbf.records.ExistingRecordStrategy;
 @Data
 @Entity
 @IdClass(PromoId.class)
+@Cacheable
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class Promo implements ChecksForExistingRecord<PromoId> {
 
 	@Override

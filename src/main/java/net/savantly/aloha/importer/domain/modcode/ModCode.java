@@ -10,6 +10,9 @@ import javax.persistence.Index;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.springframework.cache.annotation.Cacheable;
+
 import lombok.Data;
 import net.savantly.aloha.importer.dbf.records.ChecksForExistingRecord;
 import net.savantly.aloha.importer.dbf.records.ExistingRecordStrategy;
@@ -17,6 +20,8 @@ import net.savantly.aloha.importer.dbf.records.ExistingRecordStrategy;
 @Data
 @Entity
 @Table(indexes = { @Index(columnList = "posKey", unique = false) })
+@Cacheable
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class ModCode implements ChecksForExistingRecord<Long> {
 
 	private Long posKey;

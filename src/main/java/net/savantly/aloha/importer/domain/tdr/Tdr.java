@@ -8,13 +8,30 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.IdClass;
 
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.springframework.cache.annotation.Cacheable;
+
 import lombok.Data;
 import net.savantly.aloha.importer.dbf.ImportIdentifiable;
+import net.savantly.aloha.importer.dbf.records.ChecksForExistingRecord;
+import net.savantly.aloha.importer.dbf.records.ExistingRecordStrategy;
 
 @Data
 @Entity
 @IdClass(TdrId.class)
-public class Tdr implements ImportIdentifiable {
+@Cacheable
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+public class Tdr implements ImportIdentifiable, ChecksForExistingRecord<TdrId> {
+	
+
+	@Override
+	public TdrId getUniqueRecordIdentifier() {
+		return new TdrId().setId(id).setPosKey(posKey);
+	}
+	@Override
+	public ExistingRecordStrategy getExistingRecordStrategy() {
+		return ExistingRecordStrategy.SKIP_IF_EQUAL;
+	}
 
 	@Id
 	private Long posKey;

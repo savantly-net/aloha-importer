@@ -31,6 +31,7 @@ import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 import software.amazon.awssdk.services.s3.model.ListObjectsV2Request;
+import software.amazon.awssdk.services.s3.model.ListObjectsV2Request.Builder;
 import software.amazon.awssdk.services.s3.paginators.ListObjectsV2Iterable;
 
 public class BucketDigester {
@@ -64,16 +65,20 @@ public class BucketDigester {
 		if (lock.tryLock()) {
 			log.info("beginning s3 digest");
 			try {
-				AtomicInteger processedCount = new AtomicInteger(0);
-				AtomicInteger skippedCount = new AtomicInteger(0);
+				final AtomicInteger processedCount = new AtomicInteger(0);
+				final AtomicInteger skippedCount = new AtomicInteger(0);
 				
-				ListObjectsV2Iterable objectPages = s3.listObjectsV2Paginator(
-						ListObjectsV2Request.builder()
-							.bucket(props.getS3().getBucketName())
-							.maxKeys(props.getS3().getDigester().getMaxPerPage())
-							.delimiter(props.getS3().getDigester().getDelimiter())
-							.prefix(props.getS3().getDigester().getPrefix())
-							.build());
+				final Builder s3RequestBuilder = ListObjectsV2Request.builder()
+						.bucket(props.getS3().getBucketName())
+						.maxKeys(props.getS3().getDigester().getMaxPerPage());
+				if (Objects.nonNull(props.getS3().getDigester().getPrefix())) {
+					s3RequestBuilder.prefix(props.getS3().getDigester().getPrefix());
+				}
+				if (Objects.nonNull(props.getS3().getDigester().getDelimiter())) {
+					s3RequestBuilder.delimiter(props.getS3().getDigester().getDelimiter());
+				}
+				
+				ListObjectsV2Iterable objectPages = s3.listObjectsV2Paginator(s3RequestBuilder.build());
 				objectPages.stream().forEach(page -> {
 					final ArrayList<CompletableFuture<ImportedFile>> completables = new ArrayList<>();
 					page.contents().parallelStream().forEach(object -> {

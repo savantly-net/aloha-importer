@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.scheduling.annotation.Async;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.linuxense.javadbf.DBFField;
 import com.linuxense.javadbf.DBFReader;
@@ -183,8 +184,16 @@ public abstract class AbstractDbfImporter<T extends ImportIdentifiable, ID exten
 				if(areEqual) {
 					return false;
 				} else {
-					repo.delete((T)optItem.get());
-					repo.save(item);
+					if(log.isTraceEnabled()) {
+						try {
+							log.trace("merging entity: {}", mapper.writeValueAsString(item));
+						} catch (JsonProcessingException e) {
+							log.error("failed to serialize entity for trace logger");
+						}
+					}
+					em.merge(item);
+					//repo.delete((T)optItem.get());
+					//repo.save(item);
 					return false;
 				}
 			default:

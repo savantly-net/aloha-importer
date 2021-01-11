@@ -75,12 +75,12 @@ public class AwsConfigProperties {
 		/**
 		 * Use a prefix when listing s3 bucket to limit results
 		 */
-		private String prefix = "";
+		private String prefix = null;
 		
 		/**
 		 * s3 key delimiter 
 		 */
-		private String delimiter = "/";
+		private String delimiter = null;
 	}
 
 }
