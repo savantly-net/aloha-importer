@@ -13,6 +13,7 @@ public enum AlohaTable {
 	GNDITEM,
 	GNDLBSUM,
 	GNDLINE, 
+	//GNDPETTYCASH,
 	GNDREVN,
 	GNDSALE,
 	GNDSLSUM,

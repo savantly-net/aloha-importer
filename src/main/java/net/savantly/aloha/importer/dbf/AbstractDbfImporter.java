@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -39,6 +41,10 @@ public abstract class AbstractDbfImporter<T extends ImportIdentifiable, ID exten
 	private final ImportedFileRepository importedFiles;
 	private final Class<T> clazz;
 	
+	// Use a single thread for tables don't have a generated ID
+	// This prevents a race condition between threads that my be adding a record with the same ID
+	private static final ThreadPoolExecutor singleThreadExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(1);
+	
 	@PersistenceContext
 	private EntityManager em;
 
@@ -48,6 +54,10 @@ public abstract class AbstractDbfImporter<T extends ImportIdentifiable, ID exten
 		this.clazz = clazz;
 	}
 	
+	protected boolean useSingleThreadedExecutor() {
+		return false;
+	};
+	
 	@Override
 	public Optional<ImportedFile> checkImport(String fileName) {
 		return this.importedFiles.findByName(fileName);
@@ -56,25 +66,34 @@ public abstract class AbstractDbfImporter<T extends ImportIdentifiable, ID exten
 	@Override
 	@Async
     public CompletableFuture<ImportedFile> process(ImportProcessingRequest request) {
+		if (this.useSingleThreadedExecutor()) {
+			return CompletableFuture.supplyAsync(() -> doWork(request), singleThreadExecutor);
+		} else {
+			return CompletableFuture.completedFuture(doWork(request));
+		}
+	}
+	
+	protected ImportedFile doWork(ImportProcessingRequest request) {
 		
 		// make sure this file hasn't been processed yet
 		Optional<ImportedFile> importCheck = checkImport(request.getImportFileName());
 		
 		// if the state is not REPROCESS, return the previous result
 		if(importCheck.isPresent() && !importCheck.get().getStatus().equals(ImportState.REPROCESS)) {
-			log.warn("file has already been processed: {} status: {}", request.getImportFileName(), importCheck.get().getStatus());
-			return CompletableFuture.completedFuture(importCheck.get());
+			log.debug("file has already been processed: {} status: {}", request.getImportFileName(), importCheck.get().getStatus());
+			return importCheck.get();
 		}
 		
-		log.info("beginning import of: {}", request.getImportFileName());
+		log.debug("beginning import of: {}", request.getImportFileName());
 		
 		// use the existing REPROCESS record or create a new record
 		ImportedFile importedFile = importCheck.orElse(new ImportedFile());
 		importedFile.setName(request.getImportFileName());
 		importedFile.setStatus(ImportState.PROCESSING);
 		importedFile = this.importedFiles.save(importedFile);
-		em.flush();
-		
+		if (em.isJoinedToTransaction()) {
+			em.flush();
+		}
 		
 		List<T> items = new ArrayList<T>();
 		boolean isError = false;
@@ -151,8 +170,7 @@ public abstract class AbstractDbfImporter<T extends ImportIdentifiable, ID exten
 		
 		// Save the result status of the import
 		this.importedFiles.save(importedFile);
-		
-		return CompletableFuture.completedFuture(importedFile);
+		return importedFile;
 	}
 
 	protected boolean isOkToAdd(T item) {
@@ -191,9 +209,12 @@ public abstract class AbstractDbfImporter<T extends ImportIdentifiable, ID exten
 							log.error("failed to serialize entity for trace logger");
 						}
 					}
-					em.merge(item);
-					//repo.delete((T)optItem.get());
-					//repo.save(item);
+					if (em.isJoinedToTransaction()) {
+						em.merge(item);
+					} else {
+						repo.delete((T)optItem.get());
+						repo.save(item);
+					}
 					return false;
 				}
 			default:

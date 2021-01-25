@@ -16,6 +16,7 @@ import net.savantly.aloha.importer.domain.gnddrwr.GndDrwrImporter;
 import net.savantly.aloha.importer.domain.gnditem.GndItemImporter;
 import net.savantly.aloha.importer.domain.gndlbsum.GndLbSumImporter;
 import net.savantly.aloha.importer.domain.gndline.GndLineImporter;
+import net.savantly.aloha.importer.domain.gndpettycash.GndPettyCash;
 import net.savantly.aloha.importer.domain.gndrevn.GndRevnImporter;
 import net.savantly.aloha.importer.domain.gndsale.GndSaleImporter;
 import net.savantly.aloha.importer.domain.gndslsum.GndSlSumImporter;
@@ -63,6 +64,8 @@ public class ImporterBeanResolver {
 			return this.context.getBean(GndLbSumImporter.class);
 		case GNDLINE:
 			return this.context.getBean(GndLineImporter.class);
+		//case GNDPETTYCASH:
+		//	return this.context.getBean(GndPettyCash.class);
 		case GNDREVN:
 			return this.context.getBean(GndRevnImporter.class);
 		case GNDSALE:

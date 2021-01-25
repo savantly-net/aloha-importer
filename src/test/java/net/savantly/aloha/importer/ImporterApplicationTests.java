@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.Resource;
+import org.springframework.test.context.ActiveProfiles;
 
 import net.savantly.aloha.importer.dbf.AlohaTable;
 import net.savantly.aloha.importer.dbf.DbfImporter;
@@ -24,6 +25,7 @@ import net.savantly.aloha.importer.dbf.ImporterBeanResolver;
 import net.savantly.aloha.importer.domain.importedFiles.ImportedFile;
 
 @SpringBootTest
+@ActiveProfiles("test")
 class ImporterApplicationTests {
 	
 	private final Logger log = LoggerFactory.getLogger(ImporterApplicationTests.class);

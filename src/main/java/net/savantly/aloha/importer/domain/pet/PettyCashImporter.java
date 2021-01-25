@@ -13,4 +13,8 @@ public class PettyCashImporter extends AbstractDbfImporter<PettyCash, PettyCashI
 		super(repo, importedFiles, PettyCash.class);
 	}
 
+	@Override
+	protected boolean useSingleThreadedExecutor() {
+		return true;
+	}
 }

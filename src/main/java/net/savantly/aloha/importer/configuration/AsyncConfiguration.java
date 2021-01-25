@@ -23,6 +23,9 @@ public class AsyncConfiguration {
 
 	@Bean (name = "taskExecutor")
     public Executor taskExecutor() {
+		if (corePoolSize > maxPoolSize) {
+			throw new RuntimeException("the async.maxPoolSize must be as big as the async.corePoolSize");
+		}
         final ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         executor.setCorePoolSize(corePoolSize);
         executor.setMaxPoolSize(maxPoolSize);

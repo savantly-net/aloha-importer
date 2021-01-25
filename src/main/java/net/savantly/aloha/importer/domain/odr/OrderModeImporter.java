@@ -13,4 +13,8 @@ public class OrderModeImporter extends AbstractDbfImporter<OrderMode, OrderModeI
 		super(repo, importedFiles, OrderMode.class);
 	}
 
+	@Override
+	protected boolean useSingleThreadedExecutor() {
+		return true;
+	}
 }

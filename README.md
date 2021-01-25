@@ -104,7 +104,7 @@ The digester expects the s3 key to include the POS Key and table name, so they m
 | aws.s3.digester.stopOnS3ReadException | Stop processing if there is an exception reading s3 object | true |
 | aws.s3.digester.maxPerPage | maximum number of keys/files in each page. Impacts the thread queue. | 50 |
 | aws.s3.digester.prefix | prefix the s3 queries to limit the search path |  |
-| aws.s3.digester.delimiter | delimiter  used in s3 queries to indicate folder paths | / |
+| aws.s3.digester.delimiter | delimiter  used in s3 queries to indicate folder paths |  |
 | async.corePoolSize | starting size of the thread pool | 2 |
 | async.maxPoolSize | maximum size of the thread pool | 2 |
 | async.queueCapacity | max queued requests | 100 |

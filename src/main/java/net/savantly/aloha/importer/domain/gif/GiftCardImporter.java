@@ -13,4 +13,8 @@ public class GiftCardImporter extends AbstractDbfImporter<GiftCard, Long>{
 		super(repo, importedFiles, GiftCard.class);
 	}
 
+	@Override
+	protected boolean useSingleThreadedExecutor() {
+		return true;
+	}
 }

@@ -13,4 +13,8 @@ public class TdrImporter extends AbstractDbfImporter<Tdr, TdrId> {
 		super(repo, importedFiles, Tdr.class);
 	}
 
+	@Override
+	protected boolean useSingleThreadedExecutor() {
+		return true;
+	}
 }

@@ -13,4 +13,8 @@ public class ModImporter extends AbstractDbfImporter<Mod, ModId> {
 		super(repo, importedFiles, Mod.class);
 	}
 
+	@Override
+	protected boolean useSingleThreadedExecutor() {
+		return true;
+	}
 }

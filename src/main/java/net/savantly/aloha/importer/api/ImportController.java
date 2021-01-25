@@ -18,6 +18,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -116,6 +117,32 @@ public class ImportController {
 		     };
 		     new Thread(r).start();
 			return ResponseEntity.ok("started");
+		} else {
+			return ResponseEntity.ok("bucket digest is not enabled");
+		}
+	}
+	
+	@DeleteMapping("/s3/digest")
+	public ResponseEntity<String> stopDigestBucket(){
+		if(context.containsBean(BucketDigester.BEAN_NAME)) {
+			BucketDigester bean = this.context.getBean(BucketDigester.class);
+			Runnable r = new Runnable() {
+		         public void run() {
+		        	 bean.stopDigest();
+		         }
+		     };
+		     new Thread(r).start();
+			return ResponseEntity.ok("stopping s3 digest");
+		} else {
+			return ResponseEntity.ok("bucket digest is not enabled");
+		}
+	}
+	
+	@GetMapping("/s3/digest")
+	public ResponseEntity<String> digestBucketStatus(){
+		if(context.containsBean(BucketDigester.BEAN_NAME)) {
+			BucketDigester bean = this.context.getBean(BucketDigester.class);
+			return ResponseEntity.ok(bean.getStatus());
 		} else {
 			return ResponseEntity.ok("bucket digest is not enabled");
 		}

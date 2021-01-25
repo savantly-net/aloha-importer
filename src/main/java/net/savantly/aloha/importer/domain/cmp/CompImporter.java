@@ -13,4 +13,8 @@ public class CompImporter extends AbstractDbfImporter<Comp, CompId> {
 		super(repo, importedFiles, Comp.class);
 	}
 
+	@Override
+	protected boolean useSingleThreadedExecutor() {
+		return true;
+	}
 }

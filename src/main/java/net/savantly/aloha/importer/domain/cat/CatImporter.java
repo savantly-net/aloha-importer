@@ -61,4 +61,9 @@ public class CatImporter extends AbstractDbfImporter<Cat, CatId> {
 		*/
 	}
 
+	@Override
+	protected boolean useSingleThreadedExecutor() {
+		return true;
+	}
+
 }

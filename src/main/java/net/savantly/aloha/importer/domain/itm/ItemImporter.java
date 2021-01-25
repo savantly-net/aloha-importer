@@ -13,4 +13,8 @@ public class ItemImporter extends AbstractDbfImporter<Item, Long> {
 		super(repo, importedFiles, Item.class);
 	}
 
+	@Override
+	protected boolean useSingleThreadedExecutor() {
+		return true;
+	}
 }

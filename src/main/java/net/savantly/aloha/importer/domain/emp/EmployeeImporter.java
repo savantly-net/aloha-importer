@@ -13,4 +13,8 @@ public class EmployeeImporter extends AbstractDbfImporter<Employee, EmployeeId> 
 		super(repo, importedFiles, Employee.class);
 	}
 
+	@Override
+	protected boolean useSingleThreadedExecutor() {
+		return true;
+	}
 }

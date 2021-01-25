@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Configuration;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 @Configuration
 @ConfigurationProperties("aws")
@@ -33,16 +34,30 @@ public class AwsConfigProperties {
 		 * If an item in the bucket matches one of these patterns, it will be parsed
 		 */
 		private List<String> keyPatterns = Arrays.asList(
-				".*CAT.*$",
-				".*GNDADJACK.*$",
-				".*GNDDRWR.*$",
-				".*GNDITEM.*$",
-				".*GNDLINE.*$",
-				".*GNDREVN.*$",
-				".*GNDSALE.*$",
-				".*GNDSLSUM.*$",
-				".*MOD.*$",
-				".*MODCODE.*$");
+				".*CAT.(dbf|DBF)$",
+				".*CMP.(dbf|DBF)$",
+				".*EMP.(dbf|DBF)$",
+				".*GIF.(dbf|DBF)$",
+				".*GNDADJACK.(dbf|DBF)$",
+				".*GNDDEPST.(dbf|DBF)$",
+				".*GNDDRWR.(dbf|DBF)$",
+				".*GNDITEM.(dbf|DBF)$",
+				".*GNDLBSUM.(dbf|DBF)$",
+				".*GNDLINE.(dbf|DBF)$",
+				//".*GNDPETTYCASH.*$", //no importer yet
+				".*GNDREVN.(dbf|DBF)$",
+				".*GNDSALE.(dbf|DBF)$",
+				".*GNDSLSUM.(dbf|DBF)$",
+				".*GNDTNDR.(dbf|DBF)$",
+				".*GNDVOID.(dbf|DBF)$",
+				".*ITM.(dbf|DBF)$",
+				".*MOD.(dbf|DBF)$",
+				".*MODCODE.(dbf|DBF)$",
+				".*ODR.(dbf|DBF)$",
+				".*PET.(dbf|DBF)$",
+				".*PRO.(dbf|DBF)$",
+				".*TAX.(dbf|DBF)$",
+				".*TDR.(dbf|DBF)$");
 		/**
 		 * This regex pattern is applied to the S3 key to create a capture group for the table name
 		 */
@@ -81,6 +96,45 @@ public class AwsConfigProperties {
 		 * s3 key delimiter 
 		 */
 		private String delimiter = null;
+		
+		/**
+		 * customize the props when started by a cron job
+		 */
+		private CronProps cronProps = new CronProps();
+	}
+	
+	@Getter @Setter @ToString
+	public static class CronProps {
+		
+		/**
+		 * Enable the dynamic templating of the cron job, otherwise calls digest with default params
+		 */
+		private boolean enabled = false;
+		
+		/**
+		 * A prefix template to be used in combination with the {@link #posKeys} list, and the dates determined by {@link #daysBack}<br/>
+		 * One digest is executed for each posKey and date<br/>
+		 * {posKey} and {date} are the available variables in a pseudo handlbars template string.<br/><br/>
+		 * Default - "gndxfer/{posKey}/{date}/"
+		 */
+		private String prefixTemplate = "gndxfer/{posKey}/{date}/";
+		
+		/**
+		 * A list of posKeys to insert in the prefix template, used in combination with each date
+		 */
+		private List<String> posKeys = Arrays.asList();
+		
+		/**
+		 * The number of days to subtract from the current date, to begin the sync
+		 */
+		private int daysBack = 1;
+		
+		/**
+		 * A custom date format to use in the {@link #prefixTemplate}
+		 */
+		private String dateFormat = "YYYYMMDD";
+
+		
 	}
 
 }

@@ -13,4 +13,8 @@ public class PromoImporter extends AbstractDbfImporter<Promo, PromoId> {
 		super(repo, importedFiles, Promo.class);
 	}
 
+	@Override
+	protected boolean useSingleThreadedExecutor() {
+		return true;
+	}
 }
