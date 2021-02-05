@@ -1,7 +1,6 @@
 package net.savantly.aloha.importer.aws.s3;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -53,8 +52,10 @@ public class BucketDigester {
 	private final Pattern tableNamePattern;
 	private final Pattern posKeyPattern;
 
+	final AtomicInteger eligibleCountTotal = new AtomicInteger(0);
 	final AtomicInteger processedCountTotal = new AtomicInteger(0);
 	final AtomicInteger skippedCountTotal = new AtomicInteger(0);
+	final AtomicInteger erroredCountTotal = new AtomicInteger(0);
 	private final AtomicBoolean stop = new AtomicBoolean(false);
 	private final Lock lock = new ReentrantLock();
 	
@@ -80,7 +81,7 @@ public class BucketDigester {
 		} else {
 			isRunning = true;
 		}
-		return String.format("running: %s, processed: %s skipped: %s", isRunning, processedCountTotal.get(), skippedCountTotal.get());
+		return String.format("running: %s, eligible: %s processed: %s skipped: %s errored: %s", isRunning, eligibleCountTotal.get(), processedCountTotal.get(), skippedCountTotal.get(), erroredCountTotal.get());
 	}
 	
 	private void digest(LocalDate startDate, LocalDate endDate, String prefixTemplate, String dateFormat, List<String> posList) {
@@ -127,8 +128,10 @@ public class BucketDigester {
 			log.info("beginning s3 digest");
 			try {
 
+				final AtomicInteger eligibleCount = new AtomicInteger(0);
 				final AtomicInteger processedCount = new AtomicInteger(0);
 				final AtomicInteger skippedCount = new AtomicInteger(0);
+				final AtomicInteger erroredCount = new AtomicInteger(0);
 				
 				// get prefix from digester props, but override if a prefix was passed into this method
 				String _prefix = props.getS3().getDigester().getPrefix();
@@ -159,8 +162,8 @@ public class BucketDigester {
 							} else {
 								final String key = object.key();
 								if(eligibleKey(key)) {
-									processedCount.getAndIncrement();
-									processedCountTotal.getAndIncrement();
+									eligibleCount.getAndIncrement();
+									eligibleCountTotal.getAndIncrement();
 									
 									final AlohaTable table = extractTableName(key);
 									final Long posKey = extractPosKey(key);
@@ -174,6 +177,8 @@ public class BucketDigester {
 										if (check.isPresent() && check.get().getStatus().equals(ImportState.REPROCESS)) {
 											log.info("reprocessing file: " + key);
 										}
+										processedCount.getAndIncrement();
+										processedCountTotal.getAndIncrement();
 										
 										final ResponseInputStream<GetObjectResponse> response = 
 												s3.getObject(GetObjectRequest.builder().bucket(props.getS3().getBucketName()).key(key).build());
@@ -186,7 +191,9 @@ public class BucketDigester {
 												throw new RuntimeException("dbfImporter.process return null. key:" + key);
 											}
 											completables.add(completable);
-										} catch (IOException e) {
+										} catch (Exception e) {
+											erroredCount.getAndIncrement();
+											erroredCountTotal.getAndIncrement();
 											if (props.getS3().getDigester().isStopOnS3ReadException()) {
 												throw new RuntimeException("failed to read s3 object: " + key);
 											}
@@ -214,7 +221,7 @@ public class BucketDigester {
 				if (stop.get()) {
 					log.info("stopped digester");
 				}
-				log.debug(String.format("completed s3 digest. processed: %s skipped: %s", processedCount.get(), skippedCount.get()));
+				log.debug(String.format("completed s3 digest. eligible: %s processed: %s skipped: %s errored: %s", eligibleCount.get(), processedCount.get(), skippedCount.get(), erroredCount.get()));
 			} catch (Exception ex) {
 				log.error("failed during import", ex);
 			} finally {

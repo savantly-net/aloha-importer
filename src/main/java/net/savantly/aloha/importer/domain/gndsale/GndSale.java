@@ -7,7 +7,6 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.Index;
 import javax.persistence.Table;
 
 import lombok.Data;
@@ -15,7 +14,7 @@ import net.savantly.aloha.importer.dbf.ImportIdentifiable;
 
 @Data
 @Entity
-@Table(indexes = { @Index(columnList = "posKey", unique = false) })
+@Table(name = "gnd_sale")
 public class GndSale implements ImportIdentifiable {
 	
 	@Id
