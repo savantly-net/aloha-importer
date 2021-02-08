@@ -47,6 +47,7 @@ public class Employee implements ImportIdentifiable {
 	@Transient
 	@Column(length = 11)
 	private String ssntext;
+	
 	@Column(length = 30)
 	private String firstname;
 	@Column(length = 30)
@@ -83,12 +84,16 @@ public class Employee implements ImportIdentifiable {
 	@Transient
 	@Column(length = 25)
 	private String password;
+	
+	@Transient
 	@Column(length = 25)
 	private String magcard;
 
 	private Long security;
 
 	private Long tips;
+	
+	@Transient
 	@Column(length = 1)
 	private String qwerty;
 
@@ -203,6 +208,7 @@ public class Employee implements ImportIdentifiable {
 	private Long pref9;
 
 	private Long pref10;
+	
 	@Column(length = 1)
 	private String meals;
 
@@ -253,6 +259,8 @@ public class Employee implements ImportIdentifiable {
 	private String empcode1;
 	@Column(length = 20)
 	private String empcode2;
+
+	@Transient
 	@Column(length = 25)
 	private String bohpasswrd;
 
@@ -307,6 +315,7 @@ public class Employee implements ImportIdentifiable {
 	@Transient
 	@Column(length = 64)
 	private String ssn_enc;
+	
 	@Column(length = 20)
 	private String empliqcert;
 
@@ -340,6 +349,8 @@ public class Employee implements ImportIdentifiable {
 	@Transient
 	@Column(length = 170)
 	private String dlskeyhash;
+
+	@Transient
 	@Column(length = 41)
 	private String loyalty;
 
