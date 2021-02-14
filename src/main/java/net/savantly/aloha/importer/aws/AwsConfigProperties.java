@@ -101,6 +101,11 @@ public class AwsConfigProperties {
 		 * customize the props when started by a cron job
 		 */
 		private CronProps cronProps = new CronProps();
+
+		/**
+		 * A uri to a resource that contains a SQL script to run after a digest. 
+		 */
+		private String afterDigestSqlSource = "classpath:/digest/afterDigest.sql";
 	}
 	
 	@Getter @Setter @ToString
@@ -120,9 +125,9 @@ public class AwsConfigProperties {
 		private String prefixTemplate = "gndxfer/{posKey}/{date}/";
 		
 		/**
-		 * A list of posKeys to insert in the prefix template, used in combination with each date
+		 * A uri to a resource that contains a list of posKeys [one per line] to insert in the prefix template, used in combination with each date
 		 */
-		private List<String> posKeys = Arrays.asList();
+		private String posKeyListSource = "classpath:/digest/poskeys";
 		
 		/**
 		 * The number of days to subtract from the current date, to begin the sync
@@ -134,7 +139,6 @@ public class AwsConfigProperties {
 		 */
 		private String dateFormat = "YYYYMMDD";
 
-		
 	}
 
 }

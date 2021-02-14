@@ -105,6 +105,12 @@ The digester expects the s3 key to include the POS Key and table name, so they m
 | aws.s3.digester.maxPerPage | maximum number of keys/files in each page. Impacts the thread queue. | 50 |
 | aws.s3.digester.prefix | prefix the s3 queries to limit the search path |  |
 | aws.s3.digester.delimiter | delimiter  used in s3 queries to indicate folder paths |  |
+| aws.s3.digester.afterDigestSqlSource | A uri to a resource that contains a SQL script to run after a digest. | classpath:/digest/afterDigest.sql |
+| aws.s3.digester.cronProps.enabled | Enable the dynamic templating of the cron job, otherwise calls digest with default params | false |
+| aws.s3.digester.cronProps.prefixTemplate | A prefix template to be used in combination with the {@link #posKeys} list, and the dates determined by {@link #daysBack}<br/>One digest is executed for each posKey and date<br/>{posKey} and {date} are the available variables in a pseudo handlbars template string. | gndxfer/{posKey}/{date}/ |
+| aws.digester.cronProps.posKeyListSource | A uri to a resource that contains a list of posKeys [one per line] to insert in the prefix template, used in combination with each date |classpath:/digest/poskeys |
+| aws.digester.cronProps.daysBack | The number of days to subtract from the current date, to begin the sync | 1 |
+| aws.digester.cronProps.dateFormat | A custom date format to use in the {@link #prefixTemplate} | YYYYMMDD |
 | async.corePoolSize | starting size of the thread pool | 2 |
 | async.maxPoolSize | maximum size of the thread pool | 2 |
 | async.queueCapacity | max queued requests | 100 |
