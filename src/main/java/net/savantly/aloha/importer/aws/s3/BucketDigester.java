@@ -329,6 +329,7 @@ public class BucketDigester {
 
 
 	private void afterDigest() {
+		log.info("loading afterDigestSqlSource: {}", props.getS3().getDigester().getAfterDigestSqlSource());
 		Resource resource = resourceLoader.getResource(props.getS3().getDigester().getAfterDigestSqlSource());
 		executeScript(resource);
 	}
@@ -336,7 +337,9 @@ public class BucketDigester {
 	public void executeScript(Resource script) {
 		ResourceDatabasePopulator databasePopulator = new ResourceDatabasePopulator(script);
 		try {
+			log.info("executing script");
 			databasePopulator.execute(datasource);
+			log.info("completed script execution");
 		} catch (ScriptException e) {
 			log.error("Error executing script , script: {}. Error: {}", script.getFilename(), e.getMessage(), e);
 		}
