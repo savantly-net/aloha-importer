@@ -132,6 +132,7 @@ public class BucketDigester {
 					props.getS3().getDigester().getCronProps().getDateFormat(), getPosKeyList());
 			log.info("completed digest with cron props");
 		} else {
+			log.info("starting s3 digest with no parameters");
 			digest(null);
 		}
 		afterDigest();
@@ -158,7 +159,7 @@ public class BucketDigester {
 
 	private void digest(String prefix) {
 		if (lock.tryLock()) {
-			log.info("beginning s3 digest");
+			log.debug("beginning s3 digest");
 			try {
 
 				final AtomicInteger eligibleCount = new AtomicInteger(0);
