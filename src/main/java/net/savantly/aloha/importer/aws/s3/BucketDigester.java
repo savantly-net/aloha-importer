@@ -126,7 +126,7 @@ public class BucketDigester {
 	public void digest() {
 		stop.set(false);
 		if (props.getS3().getDigester().getCronProps().isEnabled()) {
-			log.info("starting digest with cron props: ", props.getS3().getDigester().getCronProps().toString());
+			log.info("starting digest with cron props: {}", props.getS3().getDigester().getCronProps().toString());
 			LocalDate startDate = LocalDate.now().minusDays(props.getS3().getDigester().getCronProps().getDaysBack());
 			digest(startDate, LocalDate.now(), props.getS3().getDigester().getCronProps().getPrefixTemplate(),
 					props.getS3().getDigester().getCronProps().getDateFormat(), getPosKeyList());
