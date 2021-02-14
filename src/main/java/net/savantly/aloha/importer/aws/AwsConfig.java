@@ -1,8 +1,11 @@
 package net.savantly.aloha.importer.aws;
 
+import javax.sql.DataSource;
+
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.ResourceLoader;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +34,7 @@ public class AwsConfig {
     
     @ConditionalOnProperty("aws.s3.digester.enabled")
     @Bean(name = BucketDigester.BEAN_NAME)
-    public BucketDigester bucketDigester(S3Client s3, ImporterBeanResolver importerBeanResolver) {
-    	return new BucketDigester(props, s3, importerBeanResolver);
+    public BucketDigester bucketDigester(S3Client s3, ImporterBeanResolver importerBeanResolver, ResourceLoader resourceLoader, DataSource datasource) {
+    	return new BucketDigester(props, s3, importerBeanResolver, resourceLoader, datasource);
     }
 }
