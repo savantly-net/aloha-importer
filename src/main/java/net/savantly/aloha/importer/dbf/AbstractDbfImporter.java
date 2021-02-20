@@ -42,7 +42,7 @@ public abstract class AbstractDbfImporter<T extends ImportIdentifiable, ID exten
 	private final Class<T> clazz;
 	
 	// Use a single thread for tables don't have a generated ID
-	// This prevents a race condition between threads that my be adding a record with the same ID
+	// This prevents a race condition between threads that may be adding a record with the same ID
 	private static final ThreadPoolExecutor singleThreadExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(1);
 	
 	@PersistenceContext
