@@ -137,7 +137,7 @@ public class AwsConfigProperties {
 		/**
 		 * A custom date format to use in the {@link #prefixTemplate}
 		 */
-		private String dateFormat = "YYYYMMDD";
+		private String dateFormat = "YYYYMMdd";
 
 	}
 

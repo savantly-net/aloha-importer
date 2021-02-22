@@ -100,7 +100,7 @@ public class BucketDigester {
 				eligibleCountTotal.get(), processedCountTotal.get(), skippedCountTotal.get(), erroredCountTotal.get());
 	}
 
-	private void digest(LocalDate startDate, LocalDate endDate, String prefixTemplate, String dateFormat,
+	protected void digest(LocalDate startDate, LocalDate endDate, String prefixTemplate, String dateFormat,
 			List<String> posList) {
 		DateTimeFormatter dateFormatter = new DateTimeFormatterBuilder().appendPattern(dateFormat).toFormatter();
 		BreakingForEach.forEach(posList.stream(), (posKey, posListBreaker) -> {
@@ -157,7 +157,7 @@ public class BucketDigester {
 		}
 	}
 
-	private void digest(String prefix) {
+	protected void digest(String prefix) {
 		if (lock.tryLock()) {
 			log.debug("beginning s3 digest");
 			try {
