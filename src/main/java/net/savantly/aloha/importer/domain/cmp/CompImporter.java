@@ -14,7 +14,7 @@ public class CompImporter extends AbstractDbfImporter<Comp, CompId> {
 	}
 
 	@Override
-	protected boolean useSingleThreadedExecutor() {
+	protected boolean hasDeterministicPrimaryKey() {
 		return true;
 	}
 }

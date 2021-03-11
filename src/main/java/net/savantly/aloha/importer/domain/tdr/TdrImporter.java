@@ -14,7 +14,7 @@ public class TdrImporter extends AbstractDbfImporter<Tdr, TdrId> {
 	}
 
 	@Override
-	protected boolean useSingleThreadedExecutor() {
+	protected boolean hasDeterministicPrimaryKey() {
 		return true;
 	}
 }

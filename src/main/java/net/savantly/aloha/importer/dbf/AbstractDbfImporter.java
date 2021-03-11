@@ -20,14 +20,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.scheduling.annotation.Async;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.linuxense.javadbf.DBFField;
 import com.linuxense.javadbf.DBFReader;
 import com.linuxense.javadbf.DBFRow;
 import com.linuxense.javadbf.DBFUtils;
 
-import net.savantly.aloha.importer.dbf.records.ChecksForExistingRecord;
 import net.savantly.aloha.importer.domain.importedFiles.ImportState;
 import net.savantly.aloha.importer.domain.importedFiles.ImportedFile;
 import net.savantly.aloha.importer.domain.importedFiles.ImportedFileRepository;
@@ -54,7 +52,7 @@ public abstract class AbstractDbfImporter<T extends ImportIdentifiable, ID exten
 		this.clazz = clazz;
 	}
 	
-	protected boolean useSingleThreadedExecutor() {
+	protected boolean hasDeterministicPrimaryKey() {
 		return false;
 	};
 	
@@ -66,9 +64,11 @@ public abstract class AbstractDbfImporter<T extends ImportIdentifiable, ID exten
 	@Override
 	@Async
     public CompletableFuture<ImportedFile> process(ImportProcessingRequest request) {
-		if (this.useSingleThreadedExecutor()) {
+		if (this.hasDeterministicPrimaryKey()) {
+			// use a single thread to prevent race conditions
 			return CompletableFuture.supplyAsync(() -> doWork(request), singleThreadExecutor);
 		} else {
+			// generated primary keys don't cause race condition, so spawn parallel threads
 			return CompletableFuture.completedFuture(doWork(request));
 		}
 	}
@@ -138,9 +138,7 @@ public abstract class AbstractDbfImporter<T extends ImportIdentifiable, ID exten
 				if(log.isTraceEnabled()) {
 					log.trace("importing: {}", item);
 				}
-				if(isOkToAdd(item)) {
-					items.add(item);
-				}
+				items.add(item);
 			}
 
 			// By now, we have iterated through all of the rows
@@ -160,7 +158,13 @@ public abstract class AbstractDbfImporter<T extends ImportIdentifiable, ID exten
 			importedFile.setRows(rowCount);
 			importedFile.setImportedRecords(items.size());
 			try {
-				this.repo.saveAll(items);
+				if (this.hasDeterministicPrimaryKey()) {
+					// save each record individually as it will merge if needed
+					items.forEach(i -> repo.save(i));
+				} else {
+					// save a batch since the primary key is generated
+					this.repo.saveAll(items);
+				}
 			} catch (Exception e) {
 				log.error("error while importing", e);
 				importedFile.setStatus(ImportState.ERROR);
@@ -171,58 +175,6 @@ public abstract class AbstractDbfImporter<T extends ImportIdentifiable, ID exten
 		// Save the result status of the import
 		this.importedFiles.save(importedFile);
 		return importedFile;
-	}
-
-	protected boolean isOkToAdd(T item) {
-		if(doesCheckForExistingRecord(item)) {
-			return doCheckForExistingRecord(item);
-		}
-		return true;
-	}
-
-	private boolean doesCheckForExistingRecord(T item) {
-		return ChecksForExistingRecord.class.isAssignableFrom(item.getClass());
-	}
-	
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private boolean doCheckForExistingRecord(T item) {
-		ChecksForExistingRecord checkedItem = (ChecksForExistingRecord)item;
-		Optional optItem = repo.findById((ID)checkedItem.getUniqueRecordIdentifier());
-		
-		//if there is
-		if(optItem.isPresent()) {
-			// check the strategy
-			switch(checkedItem.getExistingRecordStrategy()) {
-			case FAIL:
-				throw new RuntimeException("A record already exists with this ID, and the strategy is set to FAIL");
-			case SKIP_ALWAYS:
-				return false;
-			case SKIP_IF_EQUAL:
-				boolean areEqual = item.equals(optItem.get());
-				if(areEqual) {
-					return false;
-				} else {
-					if(log.isTraceEnabled()) {
-						try {
-							log.trace("merging entity: {}", mapper.writeValueAsString(item));
-						} catch (JsonProcessingException e) {
-							log.error("failed to serialize entity for trace logger");
-						}
-					}
-					if (em.isJoinedToTransaction()) {
-						em.merge(item);
-					} else {
-						repo.delete((T)optItem.get());
-						repo.save(item);
-					}
-					return false;
-				}
-			default:
-				throw new RuntimeException("how did this happen?");
-			}
-		} else { // the record didnt already exist in the DB
-			return true;
-		}
 	}
 
 }

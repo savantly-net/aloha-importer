@@ -8,35 +8,23 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Index;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.springframework.cache.annotation.Cacheable;
 
 import lombok.Data;
-import net.savantly.aloha.importer.dbf.records.ChecksForExistingRecord;
-import net.savantly.aloha.importer.dbf.records.ExistingRecordStrategy;
+import net.savantly.aloha.importer.dbf.ImportIdentifiable;
 
 @Data
 @Entity
 @Table(indexes = { @Index(columnList = "posKey", unique = false) })
 @Cacheable
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-public class ModCode implements ChecksForExistingRecord<Long> {
+public class ModCode implements ImportIdentifiable {
 
 	private Long posKey;
 	private Long importId;
 	private Date importDate;
-	
-	@Override
-	@Transient
-	public Long getUniqueRecordIdentifier() {
-		return number;
-	}
-	@Override
-	public ExistingRecordStrategy getExistingRecordStrategy() {
-		return ExistingRecordStrategy.SKIP_IF_EQUAL;
-	}
 
 	private Long usernumber;
 	@Id

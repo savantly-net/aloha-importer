@@ -13,8 +13,7 @@ import org.springframework.cache.annotation.Cacheable;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import net.savantly.aloha.importer.dbf.records.ChecksForExistingRecord;
-import net.savantly.aloha.importer.dbf.records.ExistingRecordStrategy;
+import net.savantly.aloha.importer.dbf.ImportIdentifiable;
 
 @Data
 @Entity
@@ -22,17 +21,7 @@ import net.savantly.aloha.importer.dbf.records.ExistingRecordStrategy;
 @EqualsAndHashCode(exclude = {"importId", "importDate"})
 @Cacheable
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-public class OrderMode implements ChecksForExistingRecord<OrderModeId> {
-	
-	@Override
-	public ExistingRecordStrategy getExistingRecordStrategy() {
-		return ExistingRecordStrategy.SKIP_IF_EQUAL;
-	}
-	
-	@Override
-	public OrderModeId getUniqueRecordIdentifier() {
-		return new OrderModeId().setId(id).setPosKey(posKey);
-	}
+public class OrderMode implements ImportIdentifiable {
 
 	@Id
 	private Long posKey;

@@ -14,7 +14,7 @@ public class OrderModeImporter extends AbstractDbfImporter<OrderMode, OrderModeI
 	}
 
 	@Override
-	protected boolean useSingleThreadedExecutor() {
+	protected boolean hasDeterministicPrimaryKey() {
 		return true;
 	}
 }

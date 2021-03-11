@@ -14,7 +14,7 @@ public class ModImporter extends AbstractDbfImporter<Mod, ModId> {
 	}
 
 	@Override
-	protected boolean useSingleThreadedExecutor() {
+	protected boolean hasDeterministicPrimaryKey() {
 		return true;
 	}
 }

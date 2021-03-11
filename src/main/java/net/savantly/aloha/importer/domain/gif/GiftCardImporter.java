@@ -14,7 +14,7 @@ public class GiftCardImporter extends AbstractDbfImporter<GiftCard, Long>{
 	}
 
 	@Override
-	protected boolean useSingleThreadedExecutor() {
+	protected boolean hasDeterministicPrimaryKey() {
 		return true;
 	}
 }

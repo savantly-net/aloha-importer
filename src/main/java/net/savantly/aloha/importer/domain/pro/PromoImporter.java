@@ -14,7 +14,7 @@ public class PromoImporter extends AbstractDbfImporter<Promo, PromoId> {
 	}
 
 	@Override
-	protected boolean useSingleThreadedExecutor() {
+	protected boolean hasDeterministicPrimaryKey() {
 		return true;
 	}
 }

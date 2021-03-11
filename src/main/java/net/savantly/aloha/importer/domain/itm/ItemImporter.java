@@ -14,7 +14,7 @@ public class ItemImporter extends AbstractDbfImporter<Item, Long> {
 	}
 
 	@Override
-	protected boolean useSingleThreadedExecutor() {
+	protected boolean hasDeterministicPrimaryKey() {
 		return true;
 	}
 }

@@ -14,7 +14,7 @@ public class PettyCashImporter extends AbstractDbfImporter<PettyCash, PettyCashI
 	}
 
 	@Override
-	protected boolean useSingleThreadedExecutor() {
+	protected boolean hasDeterministicPrimaryKey() {
 		return true;
 	}
 }

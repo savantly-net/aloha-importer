@@ -7,15 +7,13 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.IdClass;
-import javax.persistence.Transient;
 
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.springframework.cache.annotation.Cacheable;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import net.savantly.aloha.importer.dbf.records.ChecksForExistingRecord;
-import net.savantly.aloha.importer.dbf.records.ExistingRecordStrategy;
+import net.savantly.aloha.importer.dbf.ImportIdentifiable;
 
 @Data
 @EqualsAndHashCode(exclude = {"importId", "importDate"})
@@ -23,7 +21,7 @@ import net.savantly.aloha.importer.dbf.records.ExistingRecordStrategy;
 @IdClass(ModId.class)
 @Cacheable
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-public class Mod implements ChecksForExistingRecord<ModId> {
+public class Mod implements ImportIdentifiable {
 
 	@Id
 	private Long posKey;
@@ -32,17 +30,6 @@ public class Mod implements ChecksForExistingRecord<ModId> {
 
 	@Id
 	private Long id;
-	
-	@Override
-	@Transient
-	public ModId getUniqueRecordIdentifier() {
-		return new ModId().setId(id).setPosKey(posKey);
-	}
-	@Override
-	@Transient
-	public ExistingRecordStrategy getExistingRecordStrategy() {
-		return ExistingRecordStrategy.SKIP_IF_EQUAL;
-	}
 
 	private Long ownerid;
 

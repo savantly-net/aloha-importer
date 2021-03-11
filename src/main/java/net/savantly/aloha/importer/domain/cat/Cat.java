@@ -6,15 +6,13 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.IdClass;
-import javax.persistence.Transient;
 
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.springframework.cache.annotation.Cacheable;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import net.savantly.aloha.importer.dbf.records.ChecksForExistingRecord;
-import net.savantly.aloha.importer.dbf.records.ExistingRecordStrategy;
+import net.savantly.aloha.importer.dbf.ImportIdentifiable;
 
 @EqualsAndHashCode(exclude = { "importId", "importDate" })
 @Data
@@ -22,23 +20,12 @@ import net.savantly.aloha.importer.dbf.records.ExistingRecordStrategy;
 @IdClass(CatId.class)
 @Cacheable
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-public class Cat implements ChecksForExistingRecord<CatId> {
+public class Cat implements ImportIdentifiable {
 
 	@Id
 	private Long posKey;
 	private Long importId;
 	private Date importDate;
-	
-
-	@Override
-	@Transient
-	public CatId getUniqueRecordIdentifier() {
-		return new CatId().setId(id).setPosKey(posKey);
-	}
-	@Override
-	public ExistingRecordStrategy getExistingRecordStrategy() {
-		return ExistingRecordStrategy.SKIP_IF_EQUAL;
-	}
 
 	@Id
 	private Long id;

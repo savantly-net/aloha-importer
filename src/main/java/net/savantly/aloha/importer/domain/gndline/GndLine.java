@@ -6,16 +6,14 @@ import java.util.Date;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.IdClass;
-import javax.persistence.Transient;
 
 import lombok.Data;
-import net.savantly.aloha.importer.dbf.records.ChecksForExistingRecord;
-import net.savantly.aloha.importer.dbf.records.ExistingRecordStrategy;
+import net.savantly.aloha.importer.dbf.ImportIdentifiable;
 
 @Data
 @Entity
 @IdClass(GndLineId.class)
-public class GndLine implements ChecksForExistingRecord<GndLineId> {
+public class GndLine implements ImportIdentifiable {
 
 	@Id
 	private Long posKey;
@@ -28,18 +26,6 @@ public class GndLine implements ChecksForExistingRecord<GndLineId> {
 	
 	private Long importId;
 	private Date importDate;
-	
-	@Transient
-	@Override
-	public GndLineId getUniqueRecordIdentifier() {
-		return new GndLineId().setPosKey(posKey).setDob(dob).setEntryid(entryid);
-	}
-
-	@Transient
-	@Override
-	public ExistingRecordStrategy getExistingRecordStrategy() {
-		return ExistingRecordStrategy.FAIL;
-	}
 
 	private Long itemid;
 

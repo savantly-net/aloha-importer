@@ -12,24 +12,14 @@ import org.springframework.cache.annotation.Cacheable;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import net.savantly.aloha.importer.dbf.records.ChecksForExistingRecord;
-import net.savantly.aloha.importer.dbf.records.ExistingRecordStrategy;
+import net.savantly.aloha.importer.dbf.ImportIdentifiable;
 
 @Data
 @Entity
 @EqualsAndHashCode(exclude = {"posKey", "importId", "importDate"})
 @Cacheable
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-public class Item implements ChecksForExistingRecord<Long> {
-	
-	@Override
-	public ExistingRecordStrategy getExistingRecordStrategy() {
-		return ExistingRecordStrategy.SKIP_IF_EQUAL;
-	}
-	@Override
-	public Long getUniqueRecordIdentifier() {
-		return id;
-	}
+public class Item implements ImportIdentifiable {
 
 	private Long posKey;
 	private Long importId;

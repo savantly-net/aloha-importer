@@ -14,7 +14,7 @@ public class EmployeeImporter extends AbstractDbfImporter<Employee, EmployeeId> 
 	}
 
 	@Override
-	protected boolean useSingleThreadedExecutor() {
+	protected boolean hasDeterministicPrimaryKey() {
 		return true;
 	}
 }
