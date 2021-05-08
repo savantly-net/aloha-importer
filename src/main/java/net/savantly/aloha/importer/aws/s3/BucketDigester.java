@@ -16,8 +16,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import javax.sql.DataSource;
@@ -58,11 +56,9 @@ public class BucketDigester {
 	private final ImporterBeanResolver importerResolver;
 	private final AwsConfigProperties props;
 	private final S3Client s3;
-	private final List<String> keyPatterns;
-	private final Pattern tableNamePattern;
-	private final Pattern posKeyPattern;
 	private final ResourceLoader resourceLoader;
 	private final DataSource datasource;
+	private final S3FilenameUtil s3FileNameUtil;
 
 	final AtomicInteger eligibleCountTotal = new AtomicInteger(0);
 	final AtomicInteger processedCountTotal = new AtomicInteger(0);
@@ -72,17 +68,14 @@ public class BucketDigester {
 	private final Lock lock = new ReentrantLock();
 
 	public BucketDigester(AwsConfigProperties props, S3Client s3, ImporterBeanResolver importerResolver,
-			ResourceLoader resourceLoader, DataSource datasource) {
+			ResourceLoader resourceLoader, DataSource datasource, S3FilenameUtil s3FileNameUtil) {
 		this.props = props;
 		this.s3 = s3;
 		this.importerResolver = importerResolver;
 		this.resourceLoader = resourceLoader;
 		this.datasource = datasource;
+		this.s3FileNameUtil = s3FileNameUtil;
 
-		this.keyPatterns = props.getS3().getDigester().getKeyPatterns();
-
-		this.posKeyPattern = Pattern.compile(props.getS3().getDigester().getPosKeyCapturePattern());
-		this.tableNamePattern = Pattern.compile(props.getS3().getDigester().getTableNameCapturePattern());
 	}
 
 	public void stopDigest() {
@@ -122,7 +115,7 @@ public class BucketDigester {
 		});
 	}
 
-	@Scheduled(cron = "${aws.s3.digester.cron:--}")
+	@Scheduled(cron = "${aws.s3.digester.cron:-}")
 	public void digest() {
 		stop.set(false);
 		if (props.getS3().getDigester().getCronProps().isEnabled()) {
@@ -195,12 +188,12 @@ public class BucketDigester {
 								breaker.stop();
 							} else {
 								final String key = object.key();
-								if (eligibleKey(key)) {
+								if (this.s3FileNameUtil.eligibleKey(key)) {
 									eligibleCount.getAndIncrement();
 									eligibleCountTotal.getAndIncrement();
 
-									final AlohaTable table = extractTableName(key);
-									final Long posKey = extractPosKey(key);
+									final AlohaTable table = s3FileNameUtil.extractTableName(key);
+									final Long posKey = s3FileNameUtil.extractPosKey(key);
 
 									final DbfImporter<? extends ImportIdentifiable, ? extends Serializable> dbfImporter = this.importerResolver
 											.getImporter(table);
@@ -273,59 +266,6 @@ public class BucketDigester {
 
 	}
 
-	private Long extractPosKey(String key) {
-		final Matcher matcher = posKeyPattern.matcher(key);
-		if (!matcher.matches()) {
-			log.info("posKeyPattern failed to match: {}", key);
-		}
-		final int captureGroup = props.getS3().getDigester().getPosKeyCaptureGroup();
-		final String extracted = matcher.group(captureGroup);
-		if (Objects.isNull(extracted)) {
-			String msg = String.format("Failed to extract pos key from: %s using pattern: %s with capture group: %s",
-					key, posKeyPattern, captureGroup);
-			log.error(msg);
-			throw new RuntimeException(String.format("failed to match for pos key: {}", matcher.toString()));
-		} else {
-			try {
-				return Long.parseLong(extracted);
-			} catch (NumberFormatException e) {
-				throw new RuntimeException(
-						"the extracted posKey doesn't appear to be in the correct format: " + extracted, e);
-			}
-		}
-	}
-
-	private AlohaTable extractTableName(String key) {
-		final Matcher matcher = tableNamePattern.matcher(key);
-		if (!matcher.matches()) {
-			log.info("tableNamePattern failed to match: {}", key);
-		}
-		final int captureGroup = props.getS3().getDigester().getTableNameCaptureGroup();
-		final String extracted = matcher.group(captureGroup);
-		if (Objects.isNull(extracted)) {
-			String msg = String.format("Failed to extract name from: %s using pattern: %s with capture group: %s", key,
-					tableNamePattern, captureGroup);
-			log.error(msg);
-			throw new RuntimeException(String.format("failed to match for table name: {}", matcher.toString()));
-		} else {
-			try {
-				AlohaTable table = AlohaTable.valueOf(extracted.toUpperCase());
-				return table;
-			} catch (Exception e) {
-				throw new RuntimeException(
-						"extracted table name doesn't match an AlohaTable value. extracted: " + extracted, e);
-			}
-		}
-	}
-
-	private boolean eligibleKey(String key) {
-		for (String pattern : keyPatterns) {
-			if (key.matches(pattern)) {
-				return true;
-			}
-		}
-		return false;
-	}
 
 
 	private void afterDigest() {

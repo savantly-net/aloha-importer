@@ -19,7 +19,10 @@ public class AwsConfigProperties {
 	 * The AWS Region
 	 */
 	private String region = "us-east-2";
+	private String accessKey;
+	private String secretKey;
 	private S3 s3 = new S3();
+	private Sqs sqs = new Sqs();
 
 	@Getter @Setter
 	public static class S3 {
@@ -106,6 +109,20 @@ public class AwsConfigProperties {
 		 * A uri to a resource that contains a SQL script to run after a digest. 
 		 */
 		private String afterDigestSqlSource = "classpath:/digest/afterDigest.sql";
+	}
+	
+	@Getter @Setter
+	public static class Sqs {
+		/**
+		 * If sqs consuming/sending should be enabled.<br>
+		 * Uses s3 digester properties
+		 */
+		private boolean enabled;
+		private String inboundQueue = "inboundAloha";
+		/** 
+		 * Where to send an SQS message with a String payload of the imported s3 object key 
+		 */
+		private String outboundQueue = "outboundAloha";
 	}
 	
 	@Getter @Setter @ToString

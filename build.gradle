@@ -18,6 +18,27 @@ repositories {
 	mavenCentral()
 }
 
+bootJar {
+	layered()
+	exclude("**/application-local.properties")
+}
+// run `./gradlew :sprout-modules-forms:dev -Psuspend=y` to suspend for debugger connection
+def suspend = project.ext.properties.suspend
+if(!suspend) {
+	suspend = 'n'
+}
+task dev(type: JavaExec) {
+    group = "Execution"
+    description = "Run the app class with JavaExecTask"
+    //classpath = sourceSets.test.runtimeClasspath
+    classpath += sourceSets.main.runtimeClasspath
+    main = 'net.savantly.aloha.importer.ImporterApplication'
+    jvmArgs=[
+  	  "-agentlib:jdwp=transport=dt_socket,server=y,suspend=$suspend,address=18080",
+	  "-Dspring.profiles.active=local"
+    ]
+}
+
 dependencies {
 	implementation platform('software.amazon.awssdk:bom:2.14.3')
 
@@ -25,6 +46,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-rest'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.data:spring-data-rest-hal-explorer'
+	implementation 'org.springframework.cloud:spring-cloud-aws-messaging:2.2.6.RELEASE'
 	
 	implementation 'org.hibernate:hibernate-ehcache'
 					
