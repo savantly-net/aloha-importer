@@ -21,6 +21,7 @@ import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.sqs.AmazonSQSAsync;
 import com.amazonaws.services.sqs.AmazonSQSAsyncClientBuilder;
+import com.amazonaws.services.sqs.model.CreateQueueResult;
 import com.amazonaws.services.sqs.model.GetQueueUrlResult;
 import com.amazonaws.services.sqs.model.QueueDoesNotExistException;
 
@@ -108,9 +109,13 @@ public class AwsConfig {
 		} else {
 			try {
 				GetQueueUrlResult qUrlResult = amazonSQSAsync.getQueueUrl(configuredInbound);
-				log.info("Using inbound queue {}", qUrlResult);
+				log.info("Using inbound queue: {}", qUrlResult.getQueueUrl());
 			} catch (QueueDoesNotExistException ex) {
-				log.error("queue does not exist: {}", configuredInbound);
+				log.warn("Queue does not exist: {}", configuredInbound);
+				log.info("Creating queue: {}", configuredInbound);
+				CreateQueueResult createQueue = amazonSQSAsync.createQueue(configuredInbound);
+				log.info("Created queue: {}", createQueue);
+				log.info("Using inbound queue: {}", createQueue.getQueueUrl());
 			}
 		}
 		
