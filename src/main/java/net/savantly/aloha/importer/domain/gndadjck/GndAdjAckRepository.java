@@ -1,7 +1,7 @@
 package net.savantly.aloha.importer.domain.gndadjck;
 
-import org.springframework.data.repository.CrudRepository;
+import net.savantly.aloha.importer.dbf.ImportIdentifiableRepository;
 
-public interface GndAdjAckRepository extends CrudRepository<GndAdjAck, Long> {
+public interface GndAdjAckRepository extends ImportIdentifiableRepository<GndAdjAck, Long> {
 
 }

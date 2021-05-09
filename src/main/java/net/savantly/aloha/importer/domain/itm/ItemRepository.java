@@ -1,7 +1,7 @@
 package net.savantly.aloha.importer.domain.itm;
 
-import org.springframework.data.repository.CrudRepository;
+import net.savantly.aloha.importer.dbf.ImportIdentifiableRepository;
 
-public interface ItemRepository extends CrudRepository<Item, Long> {
+public interface ItemRepository extends ImportIdentifiableRepository<Item, Long> {
 
 }

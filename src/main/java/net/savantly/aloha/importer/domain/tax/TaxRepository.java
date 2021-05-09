@@ -1,7 +1,7 @@
 package net.savantly.aloha.importer.domain.tax;
 
-import org.springframework.data.repository.CrudRepository;
+import net.savantly.aloha.importer.dbf.ImportIdentifiableRepository;
 
-public interface TaxRepository extends CrudRepository<Tax, TaxId>{
+public interface TaxRepository extends ImportIdentifiableRepository<Tax, TaxId>{
 
 }

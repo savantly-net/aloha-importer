@@ -1,7 +1,7 @@
 package net.savantly.aloha.importer.domain.cmp;
 
-import org.springframework.data.repository.CrudRepository;
+import net.savantly.aloha.importer.dbf.ImportIdentifiableRepository;
 
-public interface CompRepository extends CrudRepository<Comp, CompId> {
+public interface CompRepository extends ImportIdentifiableRepository<Comp, CompId> {
 
 }

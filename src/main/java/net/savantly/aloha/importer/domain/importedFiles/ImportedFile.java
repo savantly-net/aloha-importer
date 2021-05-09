@@ -10,6 +10,7 @@ import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
 import lombok.Data;
+import net.savantly.aloha.importer.dbf.AlohaTable;
 
 @Data
 @Entity
@@ -29,4 +30,9 @@ public class ImportedFile {
 	
 	@Column(length = 1000)
 	private String errorMessage;
+
+	@Enumerated(EnumType.STRING)
+	private AlohaTable alohaTable;
+	
+	private Long size;
 }

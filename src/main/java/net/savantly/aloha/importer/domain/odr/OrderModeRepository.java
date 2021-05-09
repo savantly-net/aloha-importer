@@ -1,7 +1,7 @@
 package net.savantly.aloha.importer.domain.odr;
 
-import org.springframework.data.repository.CrudRepository;
+import net.savantly.aloha.importer.dbf.ImportIdentifiableRepository;
 
-public interface OrderModeRepository extends CrudRepository<OrderMode, OrderModeId> {
+public interface OrderModeRepository extends ImportIdentifiableRepository<OrderMode, OrderModeId> {
 
 }

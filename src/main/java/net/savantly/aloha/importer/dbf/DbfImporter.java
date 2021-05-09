@@ -10,5 +10,6 @@ public interface DbfImporter<T extends ImportIdentifiable, ID extends Serializab
 
 	CompletableFuture<ImportedFile> process(ImportProcessingRequest request);
 	Optional<ImportedFile> checkImport(String fileName);
+	void deleteImport(String fileName);
 
 }

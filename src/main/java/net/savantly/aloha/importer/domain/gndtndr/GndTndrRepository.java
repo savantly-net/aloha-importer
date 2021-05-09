@@ -1,7 +1,7 @@
 package net.savantly.aloha.importer.domain.gndtndr;
 
-import org.springframework.data.repository.CrudRepository;
+import net.savantly.aloha.importer.dbf.ImportIdentifiableRepository;
 
-public interface GndTndrRepository extends CrudRepository<GndTndr, GndTndrId> {
+public interface GndTndrRepository extends ImportIdentifiableRepository<GndTndr, GndTndrId> {
 
 }

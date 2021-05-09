@@ -118,11 +118,11 @@ public class AwsConfigProperties {
 		 * Uses s3 digester properties
 		 */
 		private boolean enabled;
-		private String inboundQueue = "inboundAloha";
+		private String inboundQueue;
 		/** 
 		 * Where to send an SQS message with a String payload of the imported s3 object key 
 		 */
-		private String outboundQueue = "outboundAloha";
+		private String outboundQueue;
 	}
 	
 	@Getter @Setter @ToString

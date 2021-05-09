@@ -12,5 +12,6 @@ public class ImportProcessingRequest {
 	private InputStream input;
 	private Long posKey;
 	private String importFileName;
+	private long size;
 	
 }

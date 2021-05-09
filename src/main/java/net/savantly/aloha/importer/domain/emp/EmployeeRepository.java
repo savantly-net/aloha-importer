@@ -1,7 +1,7 @@
 package net.savantly.aloha.importer.domain.emp;
 
-import org.springframework.data.repository.CrudRepository;
+import net.savantly.aloha.importer.dbf.ImportIdentifiableRepository;
 
-public interface EmployeeRepository extends CrudRepository<Employee, EmployeeId> {
+public interface EmployeeRepository extends ImportIdentifiableRepository<Employee, EmployeeId> {
 
 }

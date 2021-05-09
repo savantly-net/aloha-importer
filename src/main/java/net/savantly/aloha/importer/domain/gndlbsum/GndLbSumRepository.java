@@ -1,7 +1,7 @@
 package net.savantly.aloha.importer.domain.gndlbsum;
 
-import org.springframework.data.repository.CrudRepository;
+import net.savantly.aloha.importer.dbf.ImportIdentifiableRepository;
 
-public interface GndLbSumRepository extends CrudRepository<GndLbSum, Long> {
+public interface GndLbSumRepository extends ImportIdentifiableRepository<GndLbSum, Long> {
 
 }

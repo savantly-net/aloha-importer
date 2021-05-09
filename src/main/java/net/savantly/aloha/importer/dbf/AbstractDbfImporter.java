@@ -12,6 +12,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 
 import javax.persistence.EntityManager;
+import javax.persistence.LockModeType;
 import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
 
@@ -35,7 +36,7 @@ public abstract class AbstractDbfImporter<T extends ImportIdentifiable, ID exten
 	
 	private final Logger log = LoggerFactory.getLogger(this.getClass());
 	private final ObjectMapper mapper = new ObjectMapper();
-	private final CrudRepository<T, ID> repo;
+	private final ImportIdentifiableRepository<T, ID> repo;
 	private final ImportedFileRepository importedFiles;
 	private final Class<T> clazz;
 	
@@ -46,7 +47,7 @@ public abstract class AbstractDbfImporter<T extends ImportIdentifiable, ID exten
 	@PersistenceContext
 	private EntityManager em;
 
-	public AbstractDbfImporter(CrudRepository<T, ID> repo, ImportedFileRepository importedFiles, Class<T> clazz) {
+	public AbstractDbfImporter(ImportIdentifiableRepository<T, ID> repo, ImportedFileRepository importedFiles, Class<T> clazz) {
 		this.repo = repo;
 		this.importedFiles = importedFiles;
 		this.clazz = clazz;
@@ -56,9 +57,21 @@ public abstract class AbstractDbfImporter<T extends ImportIdentifiable, ID exten
 		return false;
 	};
 	
+	protected abstract AlohaTable getAlohaTable();
+	
 	@Override
 	public Optional<ImportedFile> checkImport(String fileName) {
 		return this.importedFiles.findByName(fileName);
+	}
+	
+	@Override
+	public void deleteImport(String fileName) {
+		Optional<ImportedFile> optImportedFileRecord = importedFiles.findByName(fileName);
+		if(optImportedFileRecord.isPresent()) {
+			ImportedFile importedFileRecord = optImportedFileRecord.get();
+			repo.deleteByImportId(importedFileRecord.getId());
+			importedFileRecord.setStatus(ImportState.DELETED);
+		}
 	}
 	
 	@Override
@@ -74,14 +87,25 @@ public abstract class AbstractDbfImporter<T extends ImportIdentifiable, ID exten
 	}
 	
 	protected ImportedFile doWork(ImportProcessingRequest request) {
+		return doWork(request, false);
+	}
+	
+	protected ImportedFile doWork(ImportProcessingRequest request, boolean skipIfAlreadyProcessed) {
 		
-		// make sure this file hasn't been processed yet
 		Optional<ImportedFile> importCheck = checkImport(request.getImportFileName());
 		
-		// if the state is not REPROCESS, return the previous result
-		if(importCheck.isPresent() && !importCheck.get().getStatus().equals(ImportState.REPROCESS)) {
-			log.debug("file has already been processed: {} status: {}", request.getImportFileName(), importCheck.get().getStatus());
-			return importCheck.get();
+		if (skipIfAlreadyProcessed) {
+			// make sure this file hasn't been processed yet
+			// if the state is not REPROCESS, return the previous result
+			if(importCheck.isPresent() && !importCheck.get().getStatus().equals(ImportState.REPROCESS)) {
+				log.debug("file has already been processed: {} status: {}", request.getImportFileName(), importCheck.get().getStatus());
+				return importCheck.get();
+			}
+		}
+		// It's not safe to re-import records with generated keys, so we delete the previously imported records first.
+		if (importCheck.isPresent() && !this.hasDeterministicPrimaryKey()) {
+			log.info("deleting previously imported records before import: {}", request.getImportFileName());
+			this.deleteImport(request.getImportFileName());
 		}
 		
 		log.debug("beginning import of: {}", request.getImportFileName());
@@ -90,6 +114,8 @@ public abstract class AbstractDbfImporter<T extends ImportIdentifiable, ID exten
 		ImportedFile importedFile = importCheck.orElse(new ImportedFile());
 		importedFile.setName(request.getImportFileName());
 		importedFile.setStatus(ImportState.PROCESSING);
+		importedFile.setAlohaTable(this.getAlohaTable());
+		importedFile.setSize(request.getSize());
 		importedFile = this.importedFiles.save(importedFile);
 		if (em.isJoinedToTransaction()) {
 			em.flush();

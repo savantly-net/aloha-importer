@@ -1,7 +1,7 @@
 package net.savantly.aloha.importer.domain.modcode;
 
-import org.springframework.data.repository.CrudRepository;
+import net.savantly.aloha.importer.dbf.ImportIdentifiableRepository;
 
-public interface ModCodeRepository extends CrudRepository<ModCode, Long> {
+public interface ModCodeRepository extends ImportIdentifiableRepository<ModCode, Long> {
 
 }

@@ -215,7 +215,7 @@ public class BucketDigester {
 										try {
 											byte[] bytes = response.readAllBytes();
 											final ImportProcessingRequest importRequest = new ImportProcessingRequest(
-													new ByteArrayInputStream(bytes), posKey, key);
+													new ByteArrayInputStream(bytes), posKey, key, bytes.length);
 											final CompletableFuture<ImportedFile> completable = dbfImporter
 													.process(importRequest);
 											if (Objects.isNull(completable)) {

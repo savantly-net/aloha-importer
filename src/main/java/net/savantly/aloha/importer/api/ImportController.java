@@ -28,7 +28,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
 import net.savantly.aloha.importer.aws.s3.BucketDigester;
+import net.savantly.aloha.importer.aws.s3.S3DeleteImportRequest;
+import net.savantly.aloha.importer.aws.s3.S3FilenameUtil;
 import net.savantly.aloha.importer.aws.s3.S3ImportRequest;
+import net.savantly.aloha.importer.dbf.AlohaTable;
 import net.savantly.aloha.importer.dbf.DbfImporter;
 import net.savantly.aloha.importer.dbf.DbfToJava;
 import net.savantly.aloha.importer.dbf.ImportIdentifiable;
@@ -53,6 +56,7 @@ public class ImportController {
 	private final ImporterBeanResolver importerResolver;
 	private final S3Client s3Client;
 	private final ImportedFileRepository importedFileRepository;
+	private final S3FilenameUtil s3FilenameUtil;
 	private final DbfToJava dfToJava = new DbfToJava();
 	
 	@GetMapping({"", "/"})
@@ -94,7 +98,7 @@ public class ImportController {
 		byte[] bytes = response.readAllBytes();
 		
 		DbfImporter<? extends ImportIdentifiable, ? extends Serializable> importer = importerResolver.getImporter(request.getTable());
-		CompletableFuture<ImportedFile> result = importer.process(new ImportProcessingRequest(new ByteArrayInputStream(bytes), request.getPosKey(), request.getFileKey()));
+		CompletableFuture<ImportedFile> result = importer.process(new ImportProcessingRequest(new ByteArrayInputStream(bytes), request.getPosKey(), request.getFileKey(), bytes.length));
 		ImportedFile importedFile = result.join();
 		switch (importedFile.getStatus()) {
 		case DONE: 
@@ -104,6 +108,14 @@ public class ImportController {
 		default: 
 			return ResponseEntity.badRequest().body(importedFile);
 		}
+	}
+	
+	@PostMapping("/s3/deleteByKey")
+	public void deleteImportedFileByS3Key(@RequestBody S3DeleteImportRequest request) {
+
+		AlohaTable alohaTable = s3FilenameUtil.extractTableName(request.getKey());
+		DbfImporter<? extends ImportIdentifiable, ? extends Serializable> importer = importerResolver.getImporter(alohaTable);
+		importer.deleteImport(request.getKey());
 	}
 	
 	@PostMapping("/s3/digest")

@@ -127,7 +127,7 @@ class ImporterApplicationTests {
 
 		byte[] bytes = Files.readAllBytes(resource.getFile().toPath());
 		ImportProcessingRequest importRequest = new ImportProcessingRequest(new ByteArrayInputStream(bytes), pos,
-				fileName);
+				fileName, bytes.length);
 		return dbfImporter.process(importRequest);
 	}
 }

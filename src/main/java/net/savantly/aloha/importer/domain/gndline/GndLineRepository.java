@@ -1,7 +1,7 @@
 package net.savantly.aloha.importer.domain.gndline;
 
-import org.springframework.data.jpa.repository.JpaRepository;
+import net.savantly.aloha.importer.dbf.ImportIdentifiableRepository;
 
-public interface GndLineRepository extends JpaRepository<GndLine, GndLineId> {
+public interface GndLineRepository extends ImportIdentifiableRepository<GndLine, GndLineId> {
 
 }

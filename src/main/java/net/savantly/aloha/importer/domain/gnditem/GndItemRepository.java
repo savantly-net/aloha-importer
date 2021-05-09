@@ -1,7 +1,7 @@
 package net.savantly.aloha.importer.domain.gnditem;
 
-import org.springframework.data.repository.PagingAndSortingRepository;
+import net.savantly.aloha.importer.dbf.ImportIdentifiableRepository;
 
-public interface GndItemRepository extends PagingAndSortingRepository<GndItem, Long> {
+public interface GndItemRepository extends ImportIdentifiableRepository<GndItem, Long> {
 
 }

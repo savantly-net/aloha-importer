@@ -1,7 +1,7 @@
 package net.savantly.aloha.importer.domain.cat;
 
-import org.springframework.data.repository.CrudRepository;
+import net.savantly.aloha.importer.dbf.ImportIdentifiableRepository;
 
-public interface CatRepository extends CrudRepository<Cat, CatId> {
+public interface CatRepository extends ImportIdentifiableRepository<Cat, CatId> {
 
 }

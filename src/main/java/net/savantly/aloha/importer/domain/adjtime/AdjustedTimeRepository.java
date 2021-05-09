@@ -1,7 +1,7 @@
 package net.savantly.aloha.importer.domain.adjtime;
 
-import org.springframework.data.repository.CrudRepository;
+import net.savantly.aloha.importer.dbf.ImportIdentifiableRepository;
 
-public interface AdjustedTimeRepository extends CrudRepository<AdjustedTime, Long> {
+public interface AdjustedTimeRepository extends ImportIdentifiableRepository<AdjustedTime, Long> {
 
 }
