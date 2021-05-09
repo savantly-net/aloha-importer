@@ -18,5 +18,10 @@ public class GndItemImporter extends AbstractDbfImporter<GndItem, Long> {
 	protected AlohaTable getAlohaTable() {
 		return AlohaTable.GNDITEM;
 	}
+	
+	@Override
+	protected boolean hasDeterministicPrimaryKey() {
+		return true;
+	}
 
 }

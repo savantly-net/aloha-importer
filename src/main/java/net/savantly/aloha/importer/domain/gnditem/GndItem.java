@@ -6,8 +6,8 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.IdClass;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -16,17 +16,19 @@ import net.savantly.aloha.importer.dbf.ImportIdentifiable;
 
 @Data
 @Entity
+@IdClass(GndItemId.class)
 public class GndItem implements ImportIdentifiable {
-
-	@Id
-	@GeneratedValue
-	private Long recordId;
 	
+	@Id
 	private Long posKey;
+	@Id
+	private Date dob;
+	@Id
+	private Long entryid;
+	
 	private Long importId;
 	private Date importDate;
 
-	private Long entryid;
 	private Long type;
 	private Long employee;
 
@@ -47,7 +49,6 @@ public class GndItem implements ImportIdentifiable {
 	private BigDecimal price;
 	private Long modcode;
 	private Long unit;
-	private Date dob;
 	private Date sysdate;
 	private Long seat;
 	private Long occasion;
