@@ -65,16 +65,18 @@ public class InboundS3EventHandler {
     		S3EventNotification.S3Entity s3Entity = eventRecord.getS3();
         	
         	final String key = s3Entity.getObject().getKey();
+        	final String bucket = s3Entity.getBucket().getName();
+        	
         	if (this.s3FileNameUtil.eligibleKey(key)) {
         		
-        		queueMessagingTemplate.convertAndSend(outboundQueue, Map.of("event", "started", "key", key));
+        		queueMessagingTemplate.convertAndSend(outboundQueue, Map.of("event", "started", "key", key, "bucket", bucket ));
 
     			final Optional<ImportedFile> check = importedFiles.findByName(key);
     			if (shouldImport(s3Entity.getObject(), check)) {
     				if (check.isPresent() && check.get().getStatus().equals(ImportState.REPROCESS)) {
     					log.info("reprocessing file: " + key);
     				}
-    				processImport(key,s3Entity.getObject().getSizeAsLong());
+    				processImport(key, bucket, s3Entity.getObject().getSizeAsLong());
     			}
     		} else {
     			log.debug("ineligible s3 key for import: {}", key);
@@ -104,7 +106,7 @@ public class InboundS3EventHandler {
 			!sizeAsLong.equals(importedFile.getSize());
 	}
 
-	private void processImport(String key, Long size) {
+	private void processImport(String key, String bucket, Long size) {
 
 		final Long posKey = s3FileNameUtil.extractPosKey(key);
 		final AlohaTable table = s3FileNameUtil.extractTableName(key);
@@ -125,11 +127,11 @@ public class InboundS3EventHandler {
 						"dbfImporter.process return null. key:" + key);
 			}
 			completable.thenAccept((importedFile) -> {
-        		queueMessagingTemplate.convertAndSend(outboundQueue, Map.of("event", "imported", "key", key));
+        		queueMessagingTemplate.convertAndSend(outboundQueue, Map.of("event", "imported", "key", key, "bucket", bucket ));
 			});
 		} catch (Exception e) {
 			log.error(String.format("failed to import key: %s",key), e);
-    		queueMessagingTemplate.convertAndSend(outboundQueue, Map.of("event", "failed", "key", key));
+    		queueMessagingTemplate.convertAndSend(outboundQueue, Map.of("event", "failed", "key", key, "bucket", bucket ));
 		}
 	}
 
