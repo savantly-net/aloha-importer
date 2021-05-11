@@ -2,6 +2,7 @@ package net.savantly.aloha.importer.aws.s3;
 
 import java.io.ByteArrayInputStream;
 import java.io.Serializable;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -31,6 +32,7 @@ import software.amazon.awssdk.core.ResponseInputStream;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectResponse;
+import static java.util.Map.entry;  
 
 @RequiredArgsConstructor
 public class InboundS3EventHandler {
@@ -65,7 +67,7 @@ public class InboundS3EventHandler {
         	final String key = s3Entity.getObject().getKey();
         	if (this.s3FileNameUtil.eligibleKey(key)) {
         		
-        		queueMessagingTemplate.convertAndSend(outboundQueue, "started:" + key);
+        		queueMessagingTemplate.convertAndSend(outboundQueue, Map.of("event", "started", "key", key));
 
     			final Optional<ImportedFile> check = importedFiles.findByName(key);
     			if (shouldImport(s3Entity.getObject(), check)) {
@@ -123,11 +125,11 @@ public class InboundS3EventHandler {
 						"dbfImporter.process return null. key:" + key);
 			}
 			completable.thenAccept((importedFile) -> {
-        		queueMessagingTemplate.convertAndSend(outboundQueue, "imported:" + key);
+        		queueMessagingTemplate.convertAndSend(outboundQueue, Map.of("event", "imported", "key", key));
 			});
 		} catch (Exception e) {
 			log.error(String.format("failed to import key: %s",key), e);
-    		queueMessagingTemplate.convertAndSend(outboundQueue, "failed:" + key);
+    		queueMessagingTemplate.convertAndSend(outboundQueue, Map.of("event", "failed", "key", key));
 		}
 	}
 
